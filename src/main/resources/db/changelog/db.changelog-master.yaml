@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: init
+      author: Pavel
+      failOnError: true
+      validCheckSum: ANY
+      changes:
+        - sqlFile: { dbms: 'h2', path: db/changelog/updates/init.sql }
