@@ -7,6 +7,9 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.time.Duration;
 
+/**
+ * output класс для udr
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,31 +19,29 @@ public class UdrDto {
     private OutcomingCall outcomingCall;
 
     public UdrDto(String number, Duration incomingDuration, Duration outcomingDuration) {
-        this.msisdn=number;
-        IncomingCall incomingCall=new IncomingCall();
-        incomingCall.totalTime= DurationFormatUtils.formatDuration(incomingDuration.toMillis(), "HH:mm:ss");
-        this.incomingCall=incomingCall;
+        this.msisdn = number;
+        IncomingCall incomingCall = new IncomingCall();
+        incomingCall.totalTime = DurationFormatUtils.formatDuration(incomingDuration.toMillis(), "HH:mm:ss");
+        this.incomingCall = incomingCall;
 
-        OutcomingCall outcomingCall=new OutcomingCall();
-        outcomingCall.totalTime= DurationFormatUtils.formatDuration(outcomingDuration.toMillis(), "HH:mm:ss");
-        this.outcomingCall=outcomingCall;
+        OutcomingCall outcomingCall = new OutcomingCall();
+        outcomingCall.totalTime = DurationFormatUtils.formatDuration(outcomingDuration.toMillis(), "HH:mm:ss");
+        this.outcomingCall = outcomingCall;
 
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    private class IncomingCall{
+    private class IncomingCall {
         String totalTime;
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    private  class OutcomingCall{
+    private class OutcomingCall {
         String totalTime;
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     }
 
 

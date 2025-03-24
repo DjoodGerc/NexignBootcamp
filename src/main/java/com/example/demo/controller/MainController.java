@@ -21,6 +21,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * RestController
+ * Может быть разделен на несколько, при необходимости.
+ */
 @RestController
 public class MainController {
     @Autowired
@@ -36,96 +40,101 @@ public class MainController {
 
 
     @GetMapping(value = "/getAllCdr")
-    public ResponseEntity<List<CdrEntity>> getAllCdr(){
-        List<CdrEntity> cdrEntities=cdrRepo.findAll();
+    public ResponseEntity<List<CdrEntity>> getAllCdr() {
+        List<CdrEntity> cdrEntities = cdrRepo.findAll();
         return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
     }
 
     @PostMapping(value = "/generate")
-    public ResponseEntity<Object> getGenerate(){
-        List<CdrEntity> cdrEntities=cdrRepo.findAll();
-        if (!cdrEntities.isEmpty()){
+    public ResponseEntity<Object> getGenerate() {
+        List<CdrEntity> cdrEntities = cdrRepo.findAll();
+        if (!cdrEntities.isEmpty()) {
             return new ResponseEntity<>("Data already generated", HttpStatus.OK);
         }
         generationService.generateSubs(10);
-        cdrEntities=generationService.generateCdr();
+        cdrEntities = generationService.generateCdr();
         return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
     }
+
     @PostMapping(value = "/generate/{nSubs}")
-    public ResponseEntity<Object> getGenerate(@PathVariable(name="nSubs") int nSubs){
-        List<CdrEntity> cdrEntities=cdrRepo.findAll();
-        if (!cdrEntities.isEmpty()){
+    public ResponseEntity<Object> getGenerate(@PathVariable(name = "nSubs") int nSubs) {
+        List<CdrEntity> cdrEntities = cdrRepo.findAll();
+        if (!cdrEntities.isEmpty()) {
             return new ResponseEntity<>("Data already generated", HttpStatus.OK);
         }
         generationService.generateSubs(nSubs);
-        cdrEntities=generationService.generateCdr();
+        cdrEntities = generationService.generateCdr();
         return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
     }
-    @GetMapping(value="/getUdr")
-    public ResponseEntity<List<UdrDto>> getUdr(){
-        List<UdrDto> udrDtos=udrService.UdrReportForAll(cdrRepo.findAll());
-        return new ResponseEntity<>(udrDtos, HttpStatus.OK);
-    }
-    @GetMapping(value="/getUdr/byYear/{year}/byMonth/{month}")
-    public ResponseEntity<List<UdrDto>> getUdr(@PathVariable(name="year") int year,@PathVariable(name="month") int month){
 
-        Timestamp start=Timestamp.valueOf(LocalDateTime.of(year,month,1,0,0,0));
-        Timestamp end=Timestamp.valueOf(LocalDateTime.of(year,month,1,0,0,0).plusMonths(1).minusSeconds(1));
-        List<UdrDto> udrDtos=udrService.UdrReportForAll(cdrRepo.findByStartCallBetween(start,end));
+    @GetMapping(value = "/getUdr")
+    public ResponseEntity<List<UdrDto>> getUdr() {
+        List<UdrDto> udrDtos = udrService.UdrReportForAll(cdrRepo.findAll());
         return new ResponseEntity<>(udrDtos, HttpStatus.OK);
     }
-    @GetMapping(value="/getUdr/byNumber/{number}")
-    public ResponseEntity<UdrDto> getUdr(@PathVariable(name="number") String number){
+
+    @GetMapping(value = "/getUdr/byYear/{year}/byMonth/{month}")
+    public ResponseEntity<List<UdrDto>> getUdr(@PathVariable(name = "year") int year, @PathVariable(name = "month") int month) {
+
+        Timestamp start = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0));
+        Timestamp end = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0).plusMonths(1).minusSeconds(1));
+        List<UdrDto> udrDtos = udrService.UdrReportForAll(cdrRepo.findByStartCallBetween(start, end));
+        return new ResponseEntity<>(udrDtos, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getUdr/byNumber/{number}")
+    public ResponseEntity<UdrDto> getUdr(@PathVariable(name = "number") String number) {
         SubscriberEntity subscriberEntity;
         try {
-            subscriberEntity=subsRepo.findByNumber(number).orElseThrow();
+            subscriberEntity = subsRepo.findByNumber(number).orElseThrow();
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        Long subsId=subscriberEntity.getId();
-        UdrDto udrDto=udrService.UdrReport(cdrRepo.findByInitiating_IdOrReceiving_Id(subsId,subsId),number);
-        return new ResponseEntity<>(udrDto, HttpStatus.OK);
-    }
-    @GetMapping(value="/getUdr/byNumber/{number}/byYear/{year}/byMonth/{month}")
-    public ResponseEntity<UdrDto> getUdr(@PathVariable(name="number") String number,@PathVariable(name="year") int year,@PathVariable(name="month") int month){
-        SubscriberEntity subscriberEntity;
-        try {
-            subscriberEntity=subsRepo.findByNumber(number).orElseThrow();
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        Long subsId=subscriberEntity.getId();
-        Timestamp start=Timestamp.valueOf(LocalDateTime.of(year,month,1,0,0,0));
-        Timestamp end=Timestamp.valueOf(LocalDateTime.of(year,month,1,0,0,0).plusMonths(1).minusSeconds(1));
-        UdrDto udrDto=udrService.UdrReport(cdrRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(subsId,start,end,subsId,start,end),number);
+        Long subsId = subscriberEntity.getId();
+        UdrDto udrDto = udrService.UdrReport(cdrRepo.findByInitiating_IdOrReceiving_Id(subsId, subsId), number);
         return new ResponseEntity<>(udrDto, HttpStatus.OK);
     }
 
-    @PostMapping(value="/createCdrReport")
-    public ResponseEntity<String> getUdr(@RequestBody ReportInputData reportInputData)  {
-        StringBuilder resStringBuilder=new StringBuilder();
+    @GetMapping(value = "/getUdr/byNumber/{number}/byYear/{year}/byMonth/{month}")
+    public ResponseEntity<UdrDto> getUdr(@PathVariable(name = "number") String number, @PathVariable(name = "year") int year, @PathVariable(name = "month") int month) {
+        SubscriberEntity subscriberEntity;
+        try {
+            subscriberEntity = subsRepo.findByNumber(number).orElseThrow();
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Long subsId = subscriberEntity.getId();
+        Timestamp start = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0));
+        Timestamp end = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0).plusMonths(1).minusSeconds(1));
+        UdrDto udrDto = udrService.UdrReport(cdrRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(subsId, start, end, subsId, start, end), number);
+        return new ResponseEntity<>(udrDto, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/createCdrReport")
+    public ResponseEntity<String> getUdr(@RequestBody ReportInputData reportInputData) {
+        StringBuilder resStringBuilder = new StringBuilder();
         long uid;
         try {
             SubscriberEntity subscriberEntity = subsRepo.findByNumber(reportInputData.getNumber()).orElseThrow();
-            uid=subscriberEntity.getId();
+            uid = subscriberEntity.getId();
         } catch (Exception e) {
             resStringBuilder.append("Subscriber not found_");
             resStringBuilder.append(UUID.randomUUID());
             return new ResponseEntity<>(resStringBuilder.toString(), HttpStatus.NOT_FOUND);
 
         }
-        if (reportInputData.getStartDate().isAfter(reportInputData.getEndDate())){
+        if (reportInputData.getStartDate().isAfter(reportInputData.getEndDate())) {
             resStringBuilder.append("Invalid dates_");
             resStringBuilder.append(UUID.randomUUID());
             return new ResponseEntity<>(resStringBuilder.toString(), HttpStatus.BAD_REQUEST);
 
 
         }
-        String res= null;
+        String res = null;
         try {
-            res = cdrService.cdrReport(uid,reportInputData.getNumber(),reportInputData.getStartDate(),reportInputData.getEndDate());
+            res = cdrService.cdrReport(uid, reportInputData.getNumber(), reportInputData.getStartDate(), reportInputData.getEndDate());
         } catch (IOException e) {
-            return new ResponseEntity<>(e.getMessage()+"_"+UUID.randomUUID(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage() + "_" + UUID.randomUUID(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(res, HttpStatus.OK);
     }

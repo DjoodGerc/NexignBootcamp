@@ -20,6 +20,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * служебный класс для работы с cdr
+ * CdrReport(params) - метод для генерации csv, по заданным параметрам
+ */
 @Service
 public class CdrService {
     @Autowired
@@ -28,10 +32,10 @@ public class CdrService {
     MyMapper mapper;
 
     public String cdrReport(long uid, String number, LocalDateTime startDateLocal, LocalDateTime endDateLocal) throws IOException {
-        Timestamp startDate=Timestamp.valueOf(startDateLocal);
-        Timestamp endDate=Timestamp.valueOf(endDateLocal);
-        List<CdrEntity> cdrEntities=cdrRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(uid,startDate,endDate,uid,startDate,endDate);
-        List<CdrDto>cdrDtos=mapper.cdrEntityListToDto(cdrEntities,number);
+        Timestamp startDate = Timestamp.valueOf(startDateLocal);
+        Timestamp endDate = Timestamp.valueOf(endDateLocal);
+        List<CdrEntity> cdrEntities = cdrRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(uid, startDate, endDate, uid, startDate, endDate);
+        List<CdrDto> cdrDtos = mapper.cdrEntityListToDto(cdrEntities, number);
         CsvMapper mapper = new CsvMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -40,15 +44,14 @@ public class CdrService {
                 .withColumnSeparator(',')
                 .withLineSeparator("\n\n")
                 .withoutQuoteChar()
-                .sortedBy("flag","initiator","receiver","startDate","endDate");
+                .sortedBy("flag", "initiator", "receiver", "startDate", "endDate");
 
 
-
-        String uuid=UUID.randomUUID().toString();
-        String fileName=number+"_"+uuid;
+        String uuid = UUID.randomUUID().toString();
+        String fileName = number + "_" + uuid;
         ObjectWriter writer = mapper.writer(schema);
 
-        writer.writeValue(new FileWriter("src/main/java/com/example/demo/reports/"+fileName+".csv", StandardCharsets.UTF_8),cdrDtos);
+        writer.writeValue(new FileWriter("src/main/java/com/example/demo/reports/" + fileName + ".csv", StandardCharsets.UTF_8), cdrDtos);
 
 
         return fileName;

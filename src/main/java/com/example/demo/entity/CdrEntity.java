@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 
+/**
+ * Entity, отражающий таблицу cdr
+ */
 @Data
 @Entity
 @Table(name = "cdr")
@@ -26,11 +29,11 @@ public class CdrEntity {
     private SubscriberEntity receiving;
 
     @Column(name = "startCall")
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private Timestamp startCall;
 
     @Column(name = "endCall")
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private Timestamp endCall;
 
 

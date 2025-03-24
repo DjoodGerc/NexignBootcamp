@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Entity, отражающий таблицу subscriber
+ */
 @Data
 @Entity
 @Table(name = "subscriber")
@@ -16,7 +19,7 @@ public class SubscriberEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name="number",nullable = false)
+    @Column(name = "number", nullable = false)
     private String number;
 
 }

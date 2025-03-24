@@ -7,22 +7,27 @@ import lombok.NoArgsConstructor;
 import java.sql.Timestamp;
 import java.time.Duration;
 
+
+/**
+ * Служебный класс для удобства создания Udr записей
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CallDataDto {
     String number;
-    Duration incomingDuration=Duration.ofSeconds(0);
-    Duration outcomingDuration=Duration.ofSeconds(0);
+    Duration incomingDuration = Duration.ofSeconds(0);
+    Duration outcomingDuration = Duration.ofSeconds(0);
 
     public CallDataDto(String number) {
-        this.number=number;
+        this.number = number;
     }
 
-    public void addIncoming(Timestamp start,Timestamp end){
-        outcomingDuration = outcomingDuration.plus(Duration.between(start.toLocalDateTime(),end.toLocalDateTime()));
+    public void addIncoming(Timestamp start, Timestamp end) {
+        outcomingDuration = outcomingDuration.plus(Duration.between(start.toLocalDateTime(), end.toLocalDateTime()));
     }
-    public void addOutcoming(Timestamp start,Timestamp end){
-        incomingDuration = incomingDuration.plus(Duration.between(start.toLocalDateTime(),end.toLocalDateTime()));
+
+    public void addOutcoming(Timestamp start, Timestamp end) {
+        incomingDuration = incomingDuration.plus(Duration.between(start.toLocalDateTime(), end.toLocalDateTime()));
     }
 }
