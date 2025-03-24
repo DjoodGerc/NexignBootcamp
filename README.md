@@ -21,8 +21,9 @@ Create table if not exists cdr(
    FOREIGN KEY (receiving_id) REFERENCES subscriber(id)
 );
 бд создается автоматически при помощи liquibase
-1) 
-  POST http://localhost:8080/generate
+
+1)    
+    POST http://localhost:8080/generate
 создает n (по умолчанию 10) пользователей с случайным номером телефона
 +генерирует случайное кол-во cdr записей звонков между ними (от 1 до 5000)
   POST http://localhost:8080/generate/{nSubs}
