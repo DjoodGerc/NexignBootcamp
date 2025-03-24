@@ -54,7 +54,7 @@ public class GenerationService {
 
 
 
-        int nCalls=random.nextInt(1,10);
+        int nCalls=random.nextInt(1,5000);
         List<Timestamp> startList =new ArrayList<>();
         List<Long> durationList=new ArrayList<>();
         for (int j = 0; j < nCalls; j++) {
@@ -65,7 +65,7 @@ public class GenerationService {
         Collections.sort(startList);
         for (int i = 0; i < startList.size(); i++) {
             int s=random.nextInt(0,subscriberEntityList.size());
-            int r=(random.nextInt(0,subscriberEntityList.size())+s)%subscriberEntityList.size();
+            int r=(random.nextInt(1,subscriberEntityList.size())+s)%subscriberEntityList.size();
             long duration=random.nextLong(86400);
             Timestamp end=Timestamp.valueOf(startList.get(i).toLocalDateTime().plusSeconds(duration));
             CdrEntity cdr=new CdrEntity(null,subscriberEntityList.get(s),subscriberEntityList.get(r),startList.get(i),end);

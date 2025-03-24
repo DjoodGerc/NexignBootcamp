@@ -37,6 +37,8 @@ dependencies {
     compileOnly "org.mapstruct:mapstruct:1.6.3"
     annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
     annotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.3'
 }
 
 tasks.named('test') {
