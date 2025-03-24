@@ -22,23 +22,23 @@ Create table if not exists cdr(
 );
 бд создается автоматически при помощи liquibase
 
-1)    
-    POST http://localhost:8080/generate
+1) 
+  -  POST http://localhost:8080/generate
 создает n (по умолчанию 10) пользователей с случайным номером телефона
 +генерирует случайное кол-во cdr записей звонков между ними (от 1 до 5000)
-  POST http://localhost:8080/generate/{nSubs}
+  - POST http://localhost:8080/generate/{nSubs}
 тоже но указываем кол-во абонентов
  - Создает записи в хронологическом порядке от за год (последняя возможная дата вчера), длина звонка -случайное значение от 1 секунды до 1 дня
 
 2) 
-  GET http://localhost:8080/getUdr
+  - GET http://localhost:8080/getUdr
 Udr для всех пользователей за весь период
-  GET http://localhost:8080/getUdr/byYear/{year}/byMonth/{month}
+  - GET http://localhost:8080/getUdr/byYear/{year}/byMonth/{month}
 Udr для всех пользователей за yyyy-mm
-  GET http://localhost:8080/getUdr/getUdr/byNumber/{number}
+  - GET http://localhost:8080/getUdr/getUdr/byNumber/{number}
 Udr для абонента с номером number за весь период тарификации
 Если абонента с таким номером не нашлось HTTP.NOT_FOUND
-  GET http://localhost:8080/getUdr/getUdr/byNumber/{number}/byYear/{year}/byMonth/{month}
+  - GET http://localhost:8080/getUdr/getUdr/byNumber/{number}/byYear/{year}/byMonth/{month}
 Udr для абонента с номером number за yyyy-mm
 Если абонента с таким номером не нашлось HTTP.NOT_FOUND
 -Возвращает udr записи типа 
@@ -53,7 +53,7 @@ Udr для абонента с номером number за yyyy-mm
 }
 
 3) 
-  POST http://localhost:8080/createCdrReport
+  - POST http://localhost:8080/createCdrReport
   example body:
 {
   "number": "79284765839",
