@@ -11,10 +11,10 @@ import java.util.UUID;
 @SpringBootTest
 class NexignBootcampTestCaseApplicationTests {
 
-	@Test
-	void contextLoads() {
+    @Test
+    void contextLoads() {
 
-        System.out.println(UUID.randomUUID().toString());
-	}
+    }
+
 
 }
