@@ -21,7 +21,7 @@ public class GenerationTest {
 
     @Test
     void generateSubsTest() {
-        List<SubscriberEntity> subscriberEntityList = generationService.generateSubs(3);
+        List<SubscriberEntity> subscriberEntityList = subsRepo.findAll();
         for (SubscriberEntity s : subscriberEntityList) {
             String sNumber = s.getNumber();
             String digitsOnly = sNumber.replaceAll("[^0-9]", "");
@@ -32,8 +32,8 @@ public class GenerationTest {
 
     @Test
     void generationCdrTest() {
-        List<SubscriberEntity> subscriberEntityList = generationService.generateSubs(3);
-        List<CdrEntity> cdrEntities = generationService.generateCdr();
+        List<SubscriberEntity> subscriberEntityList = subsRepo.findAll();
+        List<CdrEntity> cdrEntities = generationService.generateCdr(1,5000);
         for (CdrEntity cdr : cdrEntities) {
             assertNotEquals(cdr.getInitiating(), cdr.getReceiving());
             assertTrue(cdr.getStartCall().before(cdr.getEndCall()));

@@ -39,9 +39,9 @@ public class MainController {
 
 
     @GetMapping(value = "/getSubs")
-    public ResponseEntity<List<SubscriberEntity>> getSubs(){
-        List<SubscriberEntity> subscriberEntityList=subsRepo.findAll();
-        return new ResponseEntity<>(subscriberEntityList,HttpStatus.OK);
+    public ResponseEntity<List<SubscriberEntity>> getSubs() {
+        List<SubscriberEntity> subscriberEntityList = subsRepo.findAll();
+        return new ResponseEntity<>(subscriberEntityList, HttpStatus.OK);
     }
 
     @GetMapping(value = "/getAllCdr")
@@ -50,7 +50,25 @@ public class MainController {
         return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
     }
 
+    @PostMapping(value = "/generate")
+    public ResponseEntity<Object> getGenerate() {
+        List<CdrEntity> cdrEntities = cdrRepo.findAll();
+        if (!cdrEntities.isEmpty()) {
+            return new ResponseEntity<>("Data already generated", HttpStatus.OK);
+        }
+        cdrEntities = generationService.generateCdr(1,5000);
+        return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
+    }
 
+    @PostMapping(value = "/generate/{bot}/{top}")
+    public ResponseEntity<Object> getGenerate(@PathVariable(name = "bot") int bot,@PathVariable(name = "top") int top) {
+        List<CdrEntity> cdrEntities = cdrRepo.findAll();
+        if (!cdrEntities.isEmpty()) {
+            return new ResponseEntity<>("Data already generated", HttpStatus.OK);
+        }
+        cdrEntities = generationService.generateCdr(bot,top);
+        return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
+    }
 
     @GetMapping(value = "/getUdr")
     public ResponseEntity<List<UdrDto>> getUdr() {

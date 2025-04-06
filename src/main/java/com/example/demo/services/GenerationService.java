@@ -33,14 +33,14 @@ public class GenerationService {
     Random random = new Random();
 
 
-    public List<CdrEntity> generateCdr() {
+    public List<CdrEntity> generateCdr(int bot, int top) {
         List<CdrEntity> cdrEntities = new ArrayList<>();
         List<SubscriberEntity> subscriberEntityList = subsRepo.findAll();
         long startTimestamp = LocalDateTime.now().minusYears(1).minusDays(1).toEpochSecond(ZoneOffset.UTC);
         long endTimestamp = LocalDateTime.now().minusDays(1).toEpochSecond(ZoneOffset.UTC);
 
 
-        int nCalls = random.nextInt(1, 5000);
+        int nCalls = random.nextInt(bot, top);
         List<Timestamp> startList = new ArrayList<>();
         for (int j = 0; j < nCalls; j++) {
             long randomTimestamp = startTimestamp + (long) (random.nextDouble() * (endTimestamp - startTimestamp));
