@@ -6,3 +6,10 @@ databaseChangeLog:
       validCheckSum: ANY
       changes:
         - sqlFile: { dbms: 'h2', path: db/changelog/updates/init.sql }
+  - changeSet:
+      id: insert-10-subs
+      author: Pavel
+      failOnError: true
+      validCheckSum: ANY
+      changes:
+        - sqlFile: { dbms: 'h2', path: db/changelog/updates/insert-10-subs.sql }

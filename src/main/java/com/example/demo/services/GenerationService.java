@@ -20,7 +20,7 @@ import java.util.Random;
  * служебный класс для генерации
  * generateSubs(int nSubs) - метод для генерации абонентов (и сохранения в бд) (можно добавить генерацию с реальными кодами операторов)
  * generateCdr() - метод для генерации cdr (и сохранения в бд) (случайное кол-во записей за год (от 1 до 5000 /можно вынести в параметр метода/))
- *
+ * <p>
  * !!! заметил, что абоненты могут генерироваться не случайные, не успею поправить.
  */
 @Service
@@ -32,26 +32,6 @@ public class GenerationService {
     CdrRepo cdrRepo;
     Random random = new Random();
 
-    public List<SubscriberEntity> generateSubs(int nSubs) {
-
-        List<SubscriberEntity> subscriberEntityList = new ArrayList<>();
-        for (int i = 0; i < nSubs; i++) {
-            while (true) {
-                StringBuilder phoneNumber = new StringBuilder();
-                phoneNumber.append(7);
-                for (int j = 0; j < 10; j++) {
-                    phoneNumber.append(random.nextInt(10));
-                }
-                if (subsRepo.findByNumber(phoneNumber.toString()).isEmpty()) {
-
-                    subscriberEntityList.add(subsRepo.saveAndFlush(new SubscriberEntity(null, phoneNumber.toString())));
-                    break;
-                }
-            }
-
-        }
-        return subscriberEntityList;
-    }
 
     public List<CdrEntity> generateCdr() {
         List<CdrEntity> cdrEntities = new ArrayList<>();
@@ -62,7 +42,6 @@ public class GenerationService {
 
         int nCalls = random.nextInt(1, 5000);
         List<Timestamp> startList = new ArrayList<>();
-        List<Long> durationList = new ArrayList<>();
         for (int j = 0; j < nCalls; j++) {
             long randomTimestamp = startTimestamp + (long) (random.nextDouble() * (endTimestamp - startTimestamp));
             startList.add(Timestamp.from(Instant.ofEpochSecond(randomTimestamp)));

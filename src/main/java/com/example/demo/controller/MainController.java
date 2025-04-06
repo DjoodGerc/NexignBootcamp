@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -39,33 +38,19 @@ public class MainController {
     CdrService cdrService;
 
 
+    @GetMapping(value = "/getSubs")
+    public ResponseEntity<List<SubscriberEntity>> getSubs(){
+        List<SubscriberEntity> subscriberEntityList=subsRepo.findAll();
+        return new ResponseEntity<>(subscriberEntityList,HttpStatus.OK);
+    }
+
     @GetMapping(value = "/getAllCdr")
     public ResponseEntity<List<CdrEntity>> getAllCdr() {
         List<CdrEntity> cdrEntities = cdrRepo.findAll();
         return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/generate")
-    public ResponseEntity<Object> getGenerate() {
-        List<CdrEntity> cdrEntities = cdrRepo.findAll();
-        if (!cdrEntities.isEmpty()) {
-            return new ResponseEntity<>("Data already generated", HttpStatus.OK);
-        }
-        generationService.generateSubs(10);
-        cdrEntities = generationService.generateCdr();
-        return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
-    }
 
-    @PostMapping(value = "/generate/{nSubs}")
-    public ResponseEntity<Object> getGenerate(@PathVariable(name = "nSubs") int nSubs) {
-        List<CdrEntity> cdrEntities = cdrRepo.findAll();
-        if (!cdrEntities.isEmpty()) {
-            return new ResponseEntity<>("Data already generated", HttpStatus.OK);
-        }
-        generationService.generateSubs(nSubs);
-        cdrEntities = generationService.generateCdr();
-        return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
-    }
 
     @GetMapping(value = "/getUdr")
     public ResponseEntity<List<UdrDto>> getUdr() {
