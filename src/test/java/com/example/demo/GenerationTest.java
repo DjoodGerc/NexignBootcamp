@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.entity.CdrEntity;
+import com.example.demo.entity.CallEntity;
 import com.example.demo.entity.SubscriberEntity;
 import com.example.demo.repository.SubsRepo;
 import com.example.demo.services.GenerationService;
@@ -23,7 +23,7 @@ public class GenerationTest {
     void generateSubsTest() {
         List<SubscriberEntity> subscriberEntityList = subsRepo.findAll();
         for (SubscriberEntity s : subscriberEntityList) {
-            String sNumber = s.getNumber();
+            String sNumber = s.getMsisdn();
             String digitsOnly = sNumber.replaceAll("[^0-9]", "");
             assertEquals(11, digitsOnly.length());
             assertEquals('7', sNumber.charAt(0));
@@ -33,8 +33,8 @@ public class GenerationTest {
     @Test
     void generationCdrTest() {
         List<SubscriberEntity> subscriberEntityList = subsRepo.findAll();
-        List<CdrEntity> cdrEntities = generationService.generateCdr(1,5000);
-        for (CdrEntity cdr : cdrEntities) {
+        List<CallEntity> cdrEntities = generationService.generateCalls(1,5000);
+        for (CallEntity cdr : cdrEntities) {
             assertNotEquals(cdr.getInitiating(), cdr.getReceiving());
             assertTrue(cdr.getStartCall().before(cdr.getEndCall()));
         }

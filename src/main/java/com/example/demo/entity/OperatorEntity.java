@@ -5,24 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Entity, отражающий таблицу subscriber
- */
 @Data
 @Entity
-@Table(name = "subscriber")
+@Table(name = "operator")
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubscriberEntity {
+public class OperatorEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "msisdn", nullable = false)
-    private String msisdn;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    private OperatorEntity operator;
-
+    @Column(name = "name")
+    private String name;
 }

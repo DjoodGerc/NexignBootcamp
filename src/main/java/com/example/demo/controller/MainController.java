@@ -2,12 +2,13 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.ReportInputData;
 import com.example.demo.dto.UdrDto;
-import com.example.demo.entity.CdrEntity;
+import com.example.demo.entity.CallEntity;
 import com.example.demo.entity.SubscriberEntity;
 import com.example.demo.repository.CdrRepo;
 import com.example.demo.repository.SubsRepo;
 import com.example.demo.services.CdrService;
 import com.example.demo.services.GenerationService;
+import com.example.demo.services.SubsService;
 import com.example.demo.services.UdrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,8 @@ public class MainController {
     SubsRepo subsRepo;
     @Autowired
     CdrService cdrService;
+    @Autowired
+    SubsService subsService;
 
 
     @GetMapping(value = "/getSubs")
@@ -43,30 +46,35 @@ public class MainController {
         List<SubscriberEntity> subscriberEntityList = subsRepo.findAll();
         return new ResponseEntity<>(subscriberEntityList, HttpStatus.OK);
     }
+    @GetMapping(value = "/getSub/{msisdn}")
+    public  ResponseEntity<SubscriberEntity> getSubByMsisdn(@PathVariable(name = "msisdn") String msisdn){
+        SubscriberEntity subscriberEntity=subsRepo.findByMsisdn(msisdn).orElseThrow();
+        return new ResponseEntity<>(subscriberEntity, HttpStatus.OK);
+    }
 
-    @GetMapping(value = "/getAllCdr")
-    public ResponseEntity<List<CdrEntity>> getAllCdr() {
-        List<CdrEntity> cdrEntities = cdrRepo.findAll();
-        return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
+    @GetMapping(value = "/getAllCalls")
+    public ResponseEntity<List<CallEntity>> getAllCalls() {
+        List<CallEntity> callEntities = cdrRepo.findAll();
+        return new ResponseEntity<>(callEntities, HttpStatus.OK);
     }
 
     @PostMapping(value = "/generate")
     public ResponseEntity<Object> getGenerate() {
-        List<CdrEntity> cdrEntities = cdrRepo.findAll();
+        List<CallEntity> cdrEntities = cdrRepo.findAll();
         if (!cdrEntities.isEmpty()) {
             return new ResponseEntity<>("Data already generated", HttpStatus.OK);
         }
-        cdrEntities = generationService.generateCdr(1,5000);
+        cdrEntities = generationService.generateCalls(1,5000);
         return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
     }
 
     @PostMapping(value = "/generate/{bot}/{top}")
     public ResponseEntity<Object> getGenerate(@PathVariable(name = "bot") int bot,@PathVariable(name = "top") int top) {
-        List<CdrEntity> cdrEntities = cdrRepo.findAll();
+        List<CallEntity> cdrEntities = cdrRepo.findAll();
         if (!cdrEntities.isEmpty()) {
             return new ResponseEntity<>("Data already generated", HttpStatus.OK);
         }
-        cdrEntities = generationService.generateCdr(bot,top);
+        cdrEntities = generationService.generateCalls(bot,top);
         return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
     }
 
@@ -85,31 +93,42 @@ public class MainController {
         return new ResponseEntity<>(udrDtos, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/getUdr/byNumber/{number}")
-    public ResponseEntity<UdrDto> getUdr(@PathVariable(name = "number") String number) {
+    @GetMapping(value = "/getUdr/byMsisdn/{msisdn}")
+    public ResponseEntity<Object> getUdr(@PathVariable(name = "msisdn") String msisdn) {
         SubscriberEntity subscriberEntity;
+
         try {
-            subscriberEntity = subsRepo.findByNumber(number).orElseThrow();
+            subscriberEntity = subsRepo.findByMsisdn(msisdn).orElseThrow();
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        if (!subsService.checkForRomashka(subscriberEntity)){
+            return new ResponseEntity<>("Subscriber of another operator",HttpStatus.NOT_FOUND);
+        }
+
         Long subsId = subscriberEntity.getId();
-        UdrDto udrDto = udrService.UdrReport(cdrRepo.findByInitiating_IdOrReceiving_Id(subsId, subsId), number);
+        UdrDto udrDto = udrService.UdrReport(cdrRepo.findByInitiating_IdOrReceiving_Id(subsId, subsId), msisdn);
         return new ResponseEntity<>(udrDto, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/getUdr/byNumber/{number}/byYear/{year}/byMonth/{month}")
-    public ResponseEntity<UdrDto> getUdr(@PathVariable(name = "number") String number, @PathVariable(name = "year") int year, @PathVariable(name = "month") int month) {
+    @GetMapping(value = "/getUdr/byMsisdn/{msisdn}/byYear/{year}/byMonth/{month}")
+    public ResponseEntity<Object> getUdr(@PathVariable(name = "msisdn") String msisdn, @PathVariable(name = "year") int year, @PathVariable(name = "month") int month) {
         SubscriberEntity subscriberEntity;
         try {
-            subscriberEntity = subsRepo.findByNumber(number).orElseThrow();
+            subscriberEntity = subsRepo.findByMsisdn(msisdn).orElseThrow();
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        if (!subsService.checkForRomashka(subscriberEntity)){
+            return new ResponseEntity<>("Subscriber of another operator",HttpStatus.NOT_FOUND);
+        }
+
         Long subsId = subscriberEntity.getId();
         Timestamp start = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0));
         Timestamp end = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0).plusMonths(1).minusSeconds(1));
-        UdrDto udrDto = udrService.UdrReport(cdrRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(subsId, start, end, subsId, start, end), number);
+        UdrDto udrDto = udrService.UdrReport(cdrRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(subsId, start, end, subsId, start, end), msisdn);
         return new ResponseEntity<>(udrDto, HttpStatus.OK);
     }
 
@@ -117,14 +136,19 @@ public class MainController {
     public ResponseEntity<String> getUdr(@RequestBody ReportInputData reportInputData) {
         StringBuilder resStringBuilder = new StringBuilder();
         long uid;
+        SubscriberEntity subscriberEntity;
         try {
-            SubscriberEntity subscriberEntity = subsRepo.findByNumber(reportInputData.getNumber()).orElseThrow();
+            subscriberEntity = subsRepo.findByMsisdn(reportInputData.getMsisdn()).orElseThrow();
             uid = subscriberEntity.getId();
+
         } catch (Exception e) {
             resStringBuilder.append("Subscriber not found_");
             resStringBuilder.append(UUID.randomUUID());
             return new ResponseEntity<>(resStringBuilder.toString(), HttpStatus.NOT_FOUND);
 
+        }
+        if (!subsService.checkForRomashka(subscriberEntity)){
+            return new ResponseEntity<>("Subscriber of another operator_"+UUID.randomUUID(),HttpStatus.NOT_FOUND);
         }
         if (reportInputData.getStartDate().isAfter(reportInputData.getEndDate())) {
             resStringBuilder.append("Invalid dates_");
@@ -135,7 +159,7 @@ public class MainController {
         }
         String res = null;
         try {
-            res = cdrService.cdrReport(uid, reportInputData.getNumber(), reportInputData.getStartDate(), reportInputData.getEndDate());
+            res = cdrService.cdrReport(uid, reportInputData.getMsisdn(), reportInputData.getStartDate(), reportInputData.getEndDate());
         } catch (IOException e) {
             return new ResponseEntity<>(e.getMessage() + "_" + UUID.randomUUID(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

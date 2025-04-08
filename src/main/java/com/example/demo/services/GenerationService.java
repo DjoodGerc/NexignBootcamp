@@ -1,6 +1,6 @@
 package com.example.demo.services;
 
-import com.example.demo.entity.CdrEntity;
+import com.example.demo.entity.CallEntity;
 import com.example.demo.entity.SubscriberEntity;
 import com.example.demo.repository.CdrRepo;
 import com.example.demo.repository.SubsRepo;
@@ -33,9 +33,10 @@ public class GenerationService {
     Random random = new Random();
 
 
-    public List<CdrEntity> generateCdr(int bot, int top) {
-        List<CdrEntity> cdrEntities = new ArrayList<>();
+    public List<CallEntity> generateCalls(int bot, int top) {
+        List<CallEntity> cdrEntities = new ArrayList<>();
         List<SubscriberEntity> subscriberEntityList = subsRepo.findAll();
+        List<SubscriberEntity> romashkaSubs=subsRepo.findByOperator_Id(1);
         long startTimestamp = LocalDateTime.now().minusYears(1).minusDays(1).toEpochSecond(ZoneOffset.UTC);
         long endTimestamp = LocalDateTime.now().minusDays(1).toEpochSecond(ZoneOffset.UTC);
 
@@ -50,10 +51,19 @@ public class GenerationService {
         Collections.sort(startList);
         for (int i = 0; i < startList.size(); i++) {
             int s = random.nextInt(0, subscriberEntityList.size());
-            int r = (random.nextInt(1, subscriberEntityList.size()) + s) % subscriberEntityList.size();
             long duration = random.nextLong(86400);
             Timestamp end = Timestamp.valueOf(startList.get(i).toLocalDateTime().plusSeconds(duration));
-            CdrEntity cdr = new CdrEntity(null, subscriberEntityList.get(s), subscriberEntityList.get(r), startList.get(i), end);
+            CallEntity cdr;
+            if (subscriberEntityList.get(s).getOperator().getId()==1) {
+                int r = (random.nextInt(1, subscriberEntityList.size()) + s) % subscriberEntityList.size();
+                cdr = new CallEntity(null, subscriberEntityList.get(s), subscriberEntityList.get(r), startList.get(i), end);
+            }
+            else{
+                int r=random.nextInt(romashkaSubs.size());
+                cdr = new CallEntity(null, subscriberEntityList.get(s), romashkaSubs.get(r), startList.get(i), end);
+            }
+
+
             cdr = cdrRepo.saveAndFlush(cdr);
             cdrEntities.add(cdr);
         }

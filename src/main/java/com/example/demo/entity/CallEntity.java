@@ -13,10 +13,10 @@ import java.sql.Timestamp;
  */
 @Data
 @Entity
-@Table(name = "cdr")
+@Table(name = "call_data")
 @AllArgsConstructor
 @NoArgsConstructor
-public class CdrEntity {
+public class CallEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

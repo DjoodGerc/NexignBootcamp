@@ -2,15 +2,18 @@
 Spring H2 Liquibase Lombok Mapstruct Jackson  
 бд: 
 ```
-Create table if not exists subscriber(  
-    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  
-    number varchar(11) UNIQUE  
-);  
-```
-//от id можно отказаться и использовать number, как pk, но, в перспективе расширения сервиса мы хотим иметь id абонентов, чтобы не работать с номерами  
-  
-```
-Create table if not exists cdr(
+create table if not exists operator(
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name varchar
+);
+
+Create table if not exists subscriber(
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    msisdn varchar(11) UNIQUE,
+    operator_id integer,
+    FOREIGN KEY (operator_id) REFERENCES operator(id)
+);
+Create table if not exists call_data(
    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
    initiating_id integer,
    receiving_id integer,
@@ -22,6 +25,25 @@ Create table if not exists cdr(
 ```
 бд создается автоматически при помощи liquibase  
 
+абоненты:  
+
+```
+INSERT INTO operator (name) values
+    ('Romashka'),
+    ('MTS'),
+    ('Megafon');
+INSERT INTO subscriber (msisdn,operator_id) VALUES
+    ('79123456789', 1),
+    ('79234567890', 2),
+    ('79345678901', 3),
+    ('79456789012', 1),
+    ('79567890123', 1),
+    ('79678901234', 2),
+    ('79789012345', 2),
+    ('79890123456', 1),
+    ('79901234567', 3),
+    ('79012345678', 1);
+```
 1) 
 ```
 POST http://localhost:8080/generate
@@ -39,20 +61,21 @@ POST http://localhost:8080/generate/{bot}/{top}
 ```
 GET http://localhost:8080/getUdr
 ```
-Udr для всех пользователей за весь период  
+Udr для всех пользователей ОПЕРАТОРА РОМАШКА за весь период  
 ```
 GET http://localhost:8080/getUdr/byYear/{year}/byMonth/{month}
 ```
-Udr для всех пользователей за yyyy-mm  
+Udr для всех пользователей ОПЕРАТОРА РОМАШКА за yyyy-mm  
 ```
-GET http://localhost:8080/getUdr/getUdr/byNumber/{number}
+GET http://localhost:8080/getUdr/getUdr/byMsisdn/{msisdn}
 ```
-Udr для абонента с номером number за весь период тарификации  
+Udr для абонента ОПЕРАТОРА РОМАШКА с номером msisdn за весь период тарификации  
 Если абонента с таким номером не нашлось HTTP.NOT_FOUND  
+Если абонент не оператора Ромашка: Subscriber of another operator NOT_FOUND
 ```
-GET http://localhost:8080/getUdr/getUdr/byNumber/{number}/byYear/{year}/byMonth/{month}
+GET http://localhost:8080/getUdr/getUdr/byMsisdn/{msisdn}/byYear/{year}/byMonth/{month}
 ```
-Udr для абонента с номером number за yyyy-mm  
+Udr для абонента ОПЕРАТОРА РОМАШКА с номером msisdn за yyyy-mm  
 Если абонента с таким номером не нашлось HTTP.NOT_FOUND  
 -Возвращает udr записи типа 
 ```
@@ -66,7 +89,7 @@ Udr для абонента с номером number за yyyy-mm
     }
 }
 ```
-
+Если абонент не оператора Ромашка: Subscriber of another operator NOT_FOUND  
 3) 
 ```
 POST http://localhost:8080/createCdrReport
@@ -74,16 +97,16 @@ POST http://localhost:8080/createCdrReport
   example body:  
 ```
 {
-  "number": "79284765839",
+  "msisdn": "79284765839",
   "startDate": "2023-10-26T22:00:00",
   "endDate": "2023-10-28T06:00:00"
 }
 ```
-Создает csv файл в папке /reports с названием {number}_{UUID}.csv, содержащий cdr записи за указанный период   
-OK: возвращает {number}_{UUID} (сsv создан)  
-NOT_FOUND: number не найден возвращает  Subscriber not found_{UUID}  
-INTERNAL_SERVER_ERROR: ловит ошибки Writer {e.message}_{UUID}   
-BAD_REQUEST:  неправильно переданы даты Invalid dates_{UUID}  
+Создает csv файл в папке /reports с названием {msisdn}\_{UUID}.csv, содержащий cdr записи за указанный период   
+OK: возвращает {msisdn}\_{UUID} (сsv создан)  
+NOT_FOUND: msisdn не найден возвращает  Subscriber not found_{UUID}  
+INTERNAL_SERVER_ERROR: ловит ошибки Writer {e.message}\_{UUID}   
+BAD_REQUEST:  неправильно переданы даты Invalid dates\_{UUID}  
   
   
   

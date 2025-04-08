@@ -4,10 +4,13 @@ import com.example.demo.entity.SubscriberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface SubsRepo extends JpaRepository<SubscriberEntity, Long> {
 
-    Optional<SubscriberEntity> findByNumber(String number);
+    Optional<SubscriberEntity> findByMsisdn(String number);
+    List<SubscriberEntity> findByOperator_IdNot(int opId);
+    List<SubscriberEntity> findByOperator_Id(int opId);
 }

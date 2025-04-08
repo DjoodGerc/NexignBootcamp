@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportInputData {
-    String number;
+    String msisdn;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime startDate;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

@@ -1,7 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.dto.CdrDto;
-import com.example.demo.entity.CdrEntity;
+import com.example.demo.entity.CallEntity;
 import com.example.demo.mapper.MyMapper;
 import com.example.demo.repository.CdrRepo;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -34,7 +34,7 @@ public class CdrService {
     public String cdrReport(long uid, String number, LocalDateTime startDateLocal, LocalDateTime endDateLocal) throws IOException {
         Timestamp startDate = Timestamp.valueOf(startDateLocal);
         Timestamp endDate = Timestamp.valueOf(endDateLocal);
-        List<CdrEntity> cdrEntities = cdrRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(uid, startDate, endDate, uid, startDate, endDate);
+        List<CallEntity> cdrEntities = cdrRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(uid, startDate, endDate, uid, startDate, endDate);
         List<CdrDto> cdrDtos = mapper.cdrEntityListToDto(cdrEntities, number);
         CsvMapper mapper = new CsvMapper();
         mapper.registerModule(new JavaTimeModule());

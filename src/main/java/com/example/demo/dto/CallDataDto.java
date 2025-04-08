@@ -15,12 +15,12 @@ import java.time.Duration;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CallDataDto {
-    String number;
+    String msisdn;
     Duration incomingDuration = Duration.ofSeconds(0);
     Duration outcomingDuration = Duration.ofSeconds(0);
 
-    public CallDataDto(String number) {
-        this.number = number;
+    public CallDataDto(String msisdn) {
+        this.msisdn = msisdn;
     }
 
     public void addIncoming(Timestamp start, Timestamp end) {
