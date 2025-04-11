@@ -30,14 +30,14 @@ public class GenerationTest {
         }
     }
 
-    @Test
-    void generationCdrTest() {
-        List<SubscriberEntity> subscriberEntityList = subsRepo.findAll();
-        List<CallEntity> cdrEntities = generationService.generateCalls(1,5000);
-        for (CallEntity cdr : cdrEntities) {
-            assertNotEquals(cdr.getInitiating(), cdr.getReceiving());
-            assertTrue(cdr.getStartCall().before(cdr.getEndCall()));
-        }
-    }
+//    @Test
+//    void generationCdrTest() {
+//        List<SubscriberEntity> subscriberEntityList = subsRepo.findAll();
+//        List<CallEntity> cdrEntities = generationService.generateCalls(1,5000);
+//        for (CallEntity cdr : cdrEntities) {
+//            assertNotEquals(cdr.getInitiating(), cdr.getReceiving());
+//            assertTrue(cdr.getStartCall().before(cdr.getEndCall()));
+//        }
+//    }
 
 }

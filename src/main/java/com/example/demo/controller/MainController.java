@@ -4,7 +4,7 @@ import com.example.demo.dto.ReportInputData;
 import com.example.demo.dto.UdrDto;
 import com.example.demo.entity.CallEntity;
 import com.example.demo.entity.SubscriberEntity;
-import com.example.demo.repository.CdrRepo;
+import com.example.demo.repository.CallRepo;
 import com.example.demo.repository.SubsRepo;
 import com.example.demo.services.CdrService;
 import com.example.demo.services.GenerationService;
@@ -28,7 +28,7 @@ import java.util.UUID;
 @RestController
 public class MainController {
     @Autowired
-    CdrRepo cdrRepo;
+    CallRepo callRepo;
     @Autowired
     GenerationService generationService;
     @Autowired
@@ -54,33 +54,33 @@ public class MainController {
 
     @GetMapping(value = "/getAllCalls")
     public ResponseEntity<List<CallEntity>> getAllCalls() {
-        List<CallEntity> callEntities = cdrRepo.findAll();
+        List<CallEntity> callEntities = callRepo.findAll();
         return new ResponseEntity<>(callEntities, HttpStatus.OK);
     }
 
     @PostMapping(value = "/generate")
-    public ResponseEntity<Object> getGenerate() {
-        List<CallEntity> cdrEntities = cdrRepo.findAll();
+    public ResponseEntity<?> getGenerate() {
+        List<CallEntity> cdrEntities = callRepo.findAll();
         if (!cdrEntities.isEmpty()) {
             return new ResponseEntity<>("Data already generated", HttpStatus.OK);
         }
-        cdrEntities = generationService.generateCalls(1,5000);
-        return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
+        int nCalls=generationService.generateCalls(1,5000);
+        return new ResponseEntity<>(String.format("%s calls generated successfully",nCalls), HttpStatus.OK);
     }
 
     @PostMapping(value = "/generate/{bot}/{top}")
-    public ResponseEntity<Object> getGenerate(@PathVariable(name = "bot") int bot,@PathVariable(name = "top") int top) {
-        List<CallEntity> cdrEntities = cdrRepo.findAll();
+    public ResponseEntity<?> getGenerate(@PathVariable(name = "bot") int bot,@PathVariable(name = "top") int top) {
+        List<CallEntity> cdrEntities = callRepo.findAll();
         if (!cdrEntities.isEmpty()) {
             return new ResponseEntity<>("Data already generated", HttpStatus.OK);
         }
-        cdrEntities = generationService.generateCalls(bot,top);
-        return new ResponseEntity<>(cdrEntities, HttpStatus.OK);
+        int nCalls=generationService.generateCalls(bot,top);
+        return new ResponseEntity<>(String.format("%s calls generated successfully",nCalls), HttpStatus.OK);
     }
 
     @GetMapping(value = "/getUdr")
     public ResponseEntity<List<UdrDto>> getUdr() {
-        List<UdrDto> udrDtos = udrService.UdrReportForAll(cdrRepo.findAll());
+        List<UdrDto> udrDtos = udrService.UdrReportForAll(callRepo.findAll());
         return new ResponseEntity<>(udrDtos, HttpStatus.OK);
     }
 
@@ -89,7 +89,7 @@ public class MainController {
 
         Timestamp start = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0));
         Timestamp end = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0).plusMonths(1).minusSeconds(1));
-        List<UdrDto> udrDtos = udrService.UdrReportForAll(cdrRepo.findByStartCallBetween(start, end));
+        List<UdrDto> udrDtos = udrService.UdrReportForAll(callRepo.findByStartCallBetween(start, end));
         return new ResponseEntity<>(udrDtos, HttpStatus.OK);
     }
 
@@ -108,7 +108,7 @@ public class MainController {
         }
 
         Long subsId = subscriberEntity.getId();
-        UdrDto udrDto = udrService.UdrReport(cdrRepo.findByInitiating_IdOrReceiving_Id(subsId, subsId), msisdn);
+        UdrDto udrDto = udrService.UdrReport(callRepo.findByInitiating_IdOrReceiving_Id(subsId, subsId), msisdn);
         return new ResponseEntity<>(udrDto, HttpStatus.OK);
     }
 
@@ -128,7 +128,7 @@ public class MainController {
         Long subsId = subscriberEntity.getId();
         Timestamp start = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0));
         Timestamp end = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0).plusMonths(1).minusSeconds(1));
-        UdrDto udrDto = udrService.UdrReport(cdrRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(subsId, start, end, subsId, start, end), msisdn);
+        UdrDto udrDto = udrService.UdrReport(callRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(subsId, start, end, subsId, start, end), msisdn);
         return new ResponseEntity<>(udrDto, HttpStatus.OK);
     }
 

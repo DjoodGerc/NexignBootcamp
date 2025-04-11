@@ -29,8 +29,8 @@ public class UdrServiceTest {
 //        for (SubscriberEntity s : subscriberEntityList) {
 //            numbers.add(s.getMsisdn());
 //        }
-//        List<CallEntity> cdrEntityList = generationService.generateCdr();
-//        List<UdrDto> udrDtos = udrService.UdrReportForAll(cdrEntityList);
+//        List<CallEntity> callEntityList = generationService.generateCdr();
+//        List<UdrDto> udrDtos = udrService.UdrReportForAll(callEntityList);
 //        for (UdrDto udr : udrDtos) {
 //            assertTrue(numbers.contains(udr.getMsisdn()));
 //        }

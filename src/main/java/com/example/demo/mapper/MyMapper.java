@@ -23,20 +23,20 @@ public abstract class MyMapper {
 
     abstract public List<UdrDto> cdListToUdrList(List<CallDataDto> callDataDtos);
 
-    public CdrDto cdrEntityToDto(CallEntity cdrEntity, String number) {
+    public CdrDto callEntityToDto(CallEntity callEntity, String number) {
         String flag;
-        if (cdrEntity.getInitiating().getMsisdn().equals(number)) {
+        if (callEntity.getInitiating().getMsisdn().equals(number)) {
             flag = "01";
         } else {
             flag = "02";
         }
-        return new CdrDto(flag, cdrEntity.getInitiating().getMsisdn(), cdrEntity.getReceiving().getMsisdn(), cdrEntity.getStartCall().toLocalDateTime(), cdrEntity.getEndCall().toLocalDateTime());
+        return new CdrDto(flag, callEntity.getInitiating().getMsisdn(), callEntity.getReceiving().getMsisdn(), callEntity.getStartCall().toLocalDateTime(), callEntity.getEndCall().toLocalDateTime());
     }
 
-    public List<CdrDto> cdrEntityListToDto(List<CallEntity> cdrEntities, String number) {
+    public List<CdrDto> callEntityListToDto(List<CallEntity> cdrEntities, String number) {
         List<CdrDto> cdrDtos = new ArrayList<>();
-        for (CallEntity cdrEntity : cdrEntities) {
-            cdrDtos.add(cdrEntityToDto(cdrEntity, number));
+        for (CallEntity callEntity : cdrEntities) {
+            cdrDtos.add(callEntityToDto(callEntity, number));
         }
         return cdrDtos;
     }

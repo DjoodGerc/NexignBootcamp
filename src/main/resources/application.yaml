@@ -11,3 +11,11 @@ spring:
     driverClassName: org.h2.Driver
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
+  rabbitmq:
+    username: user
+    password: password
+    ports:
+      - "5672:5672"
+    template:
+      exchange: cdr_exchange
+      routing-key: cdr_routing_key

@@ -2,7 +2,7 @@ package com.example.demo;
 
 import com.example.demo.entity.CallEntity;
 import com.example.demo.entity.SubscriberEntity;
-import com.example.demo.repository.CdrRepo;
+import com.example.demo.repository.CallRepo;
 import com.example.demo.repository.SubsRepo;
 import com.example.demo.services.CdrService;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class CdrServiceTest {
     @Autowired
-    CdrRepo cdrRepo;
+    CallRepo callRepo;
     @Autowired
     SubsRepo subsRepo;
     @Autowired
@@ -30,7 +30,7 @@ public class CdrServiceTest {
         SubscriberEntity s1 = subsRepo.saveAndFlush(new SubscriberEntity(null, "71111111111"));
         SubscriberEntity s2 = subsRepo.saveAndFlush(new SubscriberEntity(null, "72222222222"));
 
-        cdrRepo.saveAndFlush(new CallEntity(null, s1, s2, Timestamp.valueOf(LocalDateTime.now().minusMinutes(3)), Timestamp.valueOf(LocalDateTime.now())));
+        callRepo.saveAndFlush(new CallEntity(null, s1, s2, Timestamp.valueOf(LocalDateTime.now().minusMinutes(3)), Timestamp.valueOf(LocalDateTime.now())));
         String fileName = cdrService.cdrReport(s1.getId(), s1.getMsisdn(), LocalDateTime.now().minusDays(1), LocalDateTime.now().plusMinutes(5));
         assertEquals(fileName.split("_")[0], s1.getMsisdn());
         //не успеваю проверить, что записалось в csv

@@ -3,7 +3,8 @@ package com.example.demo.services;
 import com.example.demo.dto.CdrDto;
 import com.example.demo.entity.CallEntity;
 import com.example.demo.mapper.MyMapper;
-import com.example.demo.repository.CdrRepo;
+import com.example.demo.rabbit.RmqProducer;
+import com.example.demo.repository.CallRepo;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -27,15 +28,22 @@ import java.util.UUID;
 @Service
 public class CdrService {
     @Autowired
-    CdrRepo cdrRepo;
+    CallRepo callRepo;
     @Autowired
     MyMapper mapper;
+    @Autowired
+    RmqProducer rmqProducer;
 
+    public void sendCdrReport(String msisdn, List<CallEntity> callEntities){
+        List<CdrDto> cdrDtos = mapper.callEntityListToDto(callEntities, msisdn);
+//        System.out.println(cdrDtos);
+        rmqProducer.sendJsonMassage(cdrDtos);
+    }
     public String cdrReport(long uid, String number, LocalDateTime startDateLocal, LocalDateTime endDateLocal) throws IOException {
         Timestamp startDate = Timestamp.valueOf(startDateLocal);
         Timestamp endDate = Timestamp.valueOf(endDateLocal);
-        List<CallEntity> cdrEntities = cdrRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(uid, startDate, endDate, uid, startDate, endDate);
-        List<CdrDto> cdrDtos = mapper.cdrEntityListToDto(cdrEntities, number);
+        List<CallEntity> cdrEntities = callRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(uid, startDate, endDate, uid, startDate, endDate);
+        List<CdrDto> cdrDtos = mapper.callEntityListToDto(cdrEntities, number);
         CsvMapper mapper = new CsvMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

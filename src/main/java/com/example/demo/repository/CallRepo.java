@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
-public interface CdrRepo extends JpaRepository<CallEntity, Long> {
+public interface CallRepo extends JpaRepository<CallEntity, Long> {
     List<CallEntity> findByInitiating_IdOrReceiving_Id(long initId, long recId);
 
     List<CallEntity> findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(long initId, Timestamp startDate1, Timestamp endDate1, long recId, Timestamp startDate, Timestamp endDate);
