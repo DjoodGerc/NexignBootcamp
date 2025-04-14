@@ -1,5 +1,9 @@
 spring.application.name: NexignBootcampTestCase
+
+nPools: 5
+
 spring:
+
   liquibase:
     enabled: true
     change-log: db/changelog/db.changelog-master.yaml

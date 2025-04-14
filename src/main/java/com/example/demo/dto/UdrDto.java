@@ -14,9 +14,9 @@ import java.time.Duration;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UdrDto {
-    private String msisdn;
-    private IncomingCall incomingCall;
-    private OutcomingCall outcomingCall;
+    public String msisdn;
+    public IncomingCall incomingCall;
+    public OutcomingCall outcomingCall;
 
     public UdrDto(String number, Duration incomingDuration, Duration outcomingDuration) {
         this.msisdn = number;
@@ -33,14 +33,14 @@ public class UdrDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    private class IncomingCall {
+    public static class IncomingCall {
         String totalTime;
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    private class OutcomingCall {
+    public static class OutcomingCall {
         String totalTime;
     }
 

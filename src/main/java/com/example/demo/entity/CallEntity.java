@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * Entity, отражающий таблицу cdr
@@ -30,11 +31,11 @@ public class CallEntity {
 
     @Column(name = "startCall")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private Timestamp startCall;
+    private LocalDateTime startCall;
 
     @Column(name = "endCall")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private Timestamp endCall;
+    private LocalDateTime endCall;
 
 
 }

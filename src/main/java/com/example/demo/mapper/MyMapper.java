@@ -4,10 +4,14 @@ import com.example.demo.dto.CallDataDto;
 import com.example.demo.dto.CdrDto;
 import com.example.demo.dto.UdrDto;
 import com.example.demo.entity.CallEntity;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -15,31 +19,34 @@ import java.util.List;
  */
 @Component
 @Mapper(componentModel = "spring")
-public abstract class MyMapper {
+public interface MyMapper {
 
-    public UdrDto callDataToUdr(CallDataDto callDataDto) {
-        return new UdrDto(callDataDto.getMsisdn(), callDataDto.getIncomingDuration(), callDataDto.getOutcomingDuration());
+    @Mapping(source = "msisdn", target = "msisdn")
+    @Mapping(source = "incomingDuration", target = "incomingCall.totalTime", qualifiedByName = "formatDuration")
+    @Mapping(source = "outcomingDuration", target = "outcomingCall.totalTime", qualifiedByName = "formatDuration")
+    UdrDto callDataToUdr(CallDataDto callDataDto);
+
+
+    @Named("formatDuration")
+    default String formatDuration(Duration duration) {
+        return DurationFormatUtils.formatDuration(duration.toMillis(), "HH:mm:ss");
     }
 
-    abstract public List<UdrDto> cdListToUdrList(List<CallDataDto> callDataDtos);
 
-    public CdrDto callEntityToDto(CallEntity callEntity, String number) {
-        String flag;
-        if (callEntity.getInitiating().getMsisdn().equals(number)) {
-            flag = "01";
-        } else {
-            flag = "02";
-        }
-        return new CdrDto(flag, callEntity.getInitiating().getMsisdn(), callEntity.getReceiving().getMsisdn(), callEntity.getStartCall().toLocalDateTime(), callEntity.getEndCall().toLocalDateTime());
+    List<UdrDto> cdListToUdrList(List<CallDataDto> callDataDtos);
+
+    @Mapping(source = "callEntity.initiating.msisdn", target = "initiator")
+    @Mapping(source = "callEntity.receiving.msisdn", target = "receiver")
+    @Mapping(source = "callEntity.startCall", target = "startDate")
+    @Mapping(source = "callEntity.endCall", target = "endDate")
+    @Mapping(target = "flag", expression = "java(determineFlag(callEntity.getInitiating().getMsisdn(), number))")
+    CdrDto callEntityToDto(CallEntity callEntity, @Context String number);
+
+    List<CdrDto> callEntityListToDto(List<CallEntity> cdrEntities, @Context String number);
+
+    @Named("determineFlag")
+    default String determineFlag(String callEntityMsisdn, @Context String number) {
+        return callEntityMsisdn.equals(number) ? "01" : "02";
     }
 
-    public List<CdrDto> callEntityListToDto(List<CallEntity> cdrEntities, String number) {
-        List<CdrDto> cdrDtos = new ArrayList<>();
-        for (CallEntity callEntity : cdrEntities) {
-            cdrDtos.add(callEntityToDto(callEntity, number));
-        }
-        return cdrDtos;
-    }
-
-    ;
 }

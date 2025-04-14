@@ -36,33 +36,7 @@ public class CdrService {
 
     public void sendCdrReport(String msisdn, List<CallEntity> callEntities){
         List<CdrDto> cdrDtos = mapper.callEntityListToDto(callEntities, msisdn);
-//        System.out.println(cdrDtos);
         rmqProducer.sendJsonMassage(cdrDtos);
     }
-    public String cdrReport(long uid, String number, LocalDateTime startDateLocal, LocalDateTime endDateLocal) throws IOException {
-        Timestamp startDate = Timestamp.valueOf(startDateLocal);
-        Timestamp endDate = Timestamp.valueOf(endDateLocal);
-        List<CallEntity> cdrEntities = callRepo.findByInitiating_IdAndStartCallBetweenOrReceiving_IdAndStartCallBetween(uid, startDate, endDate, uid, startDate, endDate);
-        List<CdrDto> cdrDtos = mapper.callEntityListToDto(cdrEntities, number);
-        CsvMapper mapper = new CsvMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        CsvSchema schema = mapper.schemaFor(CdrDto.class)
-                .withColumnSeparator(',')
-                .withLineSeparator("\n\n")
-                .withoutQuoteChar()
-                .sortedBy("flag", "initiator", "receiver", "startDate", "endDate");
-
-
-        String uuid = UUID.randomUUID().toString();
-        String fileName = number + "_" + uuid;
-        ObjectWriter writer = mapper.writer(schema);
-
-        writer.writeValue(new FileWriter("src/main/java/com/example/demo/reports/" + fileName + ".csv", StandardCharsets.UTF_8), cdrDtos);
-
-
-        return fileName;
-
-    }
 }

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 
 /**
@@ -23,11 +24,11 @@ public class CallDataDto {
         this.msisdn = msisdn;
     }
 
-    public void addIncoming(Timestamp start, Timestamp end) {
-        outcomingDuration = outcomingDuration.plus(Duration.between(start.toLocalDateTime(), end.toLocalDateTime()));
+    public void addIncoming(LocalDateTime start, LocalDateTime end) {
+        outcomingDuration = outcomingDuration.plus(Duration.between(start, end));
     }
 
-    public void addOutcoming(Timestamp start, Timestamp end) {
-        incomingDuration = incomingDuration.plus(Duration.between(start.toLocalDateTime(), end.toLocalDateTime()));
+    public void addOutcoming(LocalDateTime start, LocalDateTime end) {
+        incomingDuration = incomingDuration.plus(Duration.between(start, end));
     }
 }
