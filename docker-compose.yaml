@@ -7,3 +7,12 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+
+  postgres:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "BrtDb"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+    ports:
+      - "5432:5432"

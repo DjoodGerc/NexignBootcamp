@@ -1,0 +1,28 @@
+spring.application.name: brt
+
+nPools: 5
+
+spring:
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/BrtDb
+    username: user
+    password: password
+    driverClassName: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: db/changelog/db.changelog-master.yaml
+    default-schema: public
+  rabbitmq:
+    username: user
+    password: password
+    ports:
+      - "5672:5672"
+    template:
+      exchange: cdr_exchange
+      routing-key: cdr_routing_key

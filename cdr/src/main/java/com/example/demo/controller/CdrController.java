@@ -4,6 +4,7 @@ import com.example.demo.dto.ReportInputData;
 import com.example.demo.dto.UdrDto;
 import com.example.demo.entity.CallEntity;
 import com.example.demo.entity.SubscriberEntity;
+import com.example.demo.exception.DataAlreadyGeneratedException;
 import com.example.demo.repository.CallRepo;
 import com.example.demo.repository.SubsRepo;
 import com.example.demo.services.CdrService;
@@ -28,7 +29,7 @@ import java.util.UUID;
  * Может быть разделен на несколько, при необходимости.
  */
 @RestController
-public class MainController {
+public class CdrController {
     @Autowired
     CallRepo callRepo;
     @Autowired
@@ -71,7 +72,7 @@ public class MainController {
      */
     @PostMapping(value = "/generate")
     @ResponseBody
-    public ResponseEntity<?> getGenerate(@RequestParam(name = "bot", defaultValue = "1", required = false) Optional<Integer> bot, @RequestParam(name = "top", required = false,defaultValue = "5000") Optional<Integer> top) {
+    public ResponseEntity<?> getGenerate(@RequestParam(name = "bot", defaultValue = "1", required = false) Optional<Integer> bot, @RequestParam(name = "top", required = false,defaultValue = "5000") Optional<Integer> top) throws DataAlreadyGeneratedException {
         int nCalls = generationService.generateCalls(bot.orElse(1), top.orElse(5000));
         return new ResponseEntity<>(String.format("%s calls generated successfully", nCalls), HttpStatus.OK);
     }

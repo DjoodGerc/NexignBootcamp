@@ -2,12 +2,15 @@ package com.example.demo.services;
 
 import com.example.demo.entity.CallEntity;
 import com.example.demo.entity.SubscriberEntity;
+import com.example.demo.exception.DataAlreadyGeneratedException;
 import com.example.demo.repository.CallRepo;
 import com.example.demo.repository.SubsRepo;
 import com.example.demo.task.GenerateTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -34,9 +37,10 @@ public class GenerationService {
     @Value("${nPools}")
     int nPools;
 
-    public int generateCalls(int bot, int top) {
+    public int generateCalls(int bot, int top) throws DataAlreadyGeneratedException {
+
         if (callRepo.count() != 0) {
-            throw new RuntimeException("Data already generated");
+            throw new DataAlreadyGeneratedException("Data Already Generated",HttpStatus.ALREADY_REPORTED);
         }
 
         List<CallEntity> calls = Collections.synchronizedList(new ArrayList<>());
