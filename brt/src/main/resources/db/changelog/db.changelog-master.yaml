@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: init
+      author: Pavel
+      failOnError: true
+      validCheckSum: ANY
+      changes:
+        - sqlFile: { dbms: 'postgresql', path: db/changelog/updates/init.sql}
+  - changeSet:
+      id: insert_data
+      author: Pavel
+      failOnError: true
+      validCheckSum: ANY
+      changes:
+        - sqlFile: { dbms: 'postgresql', path: db/changelog/updates/insert_data.sql }

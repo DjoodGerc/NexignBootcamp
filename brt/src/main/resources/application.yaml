@@ -1,19 +1,21 @@
 spring.application.name: brt
 
-nPools: 5
+server:
+  port: 8081
+
 
 spring:
-  jpa:
-    database: POSTGRESQL
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
   datasource:
-    platform: postgres
-    url: jdbc:postgresql://localhost:5432/BrtDb
+    #    platform: postgres
+    url: "jdbc:postgresql://localhost:5430/brt_db"
     username: user
     password: password
     driverClassName: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+
   liquibase:
     enabled: true
     change-log: db/changelog/db.changelog-master.yaml
@@ -24,5 +26,7 @@ spring:
     ports:
       - "5672:5672"
     template:
-      exchange: cdr_exchange
-      routing-key: cdr_routing_key
+      queue: cdr_queue
+hrs:
+  service:
+    url: "http://localhost:8082"

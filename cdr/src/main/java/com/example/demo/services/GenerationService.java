@@ -15,8 +15,10 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * служебный класс для генерации
@@ -60,71 +62,99 @@ public class GenerationService {
         }
 
         pool.shutdown();
-        while (!pool.isTerminated()) {
+        try {
+            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread interrupted", e);
+        }
 
-        }
+        // Сортируем звонки по времени начала
         calls.sort(Comparator.comparing(CallEntity::getStartCall));
-        HashMap<String, List<CallEntity>> cdrMap = new HashMap<>();
-        for (SubscriberEntity sub : allSubs) {
-            cdrMap.put(sub.getMsisdn(), new ArrayList<>());
-        }
+
+        // Используем ConcurrentHashMap для потокобезопасности
+        ConcurrentHashMap<String, List<CallEntity>> cdrMap = new ConcurrentHashMap<>();
+        allSubs.forEach(sub -> cdrMap.put(sub.getMsisdn(), new ArrayList<>()));
+
         int approvedCalls = 0;
-        for (CallEntity c : calls) {
-            List<CallEntity> initList = cdrMap.getOrDefault(c.getInitiating().getMsisdn(), new ArrayList<>());
-            if (validatedCall(initList, c)) {
-                continue;
+        for (CallEntity call : calls) {
+            String initMsisdn = call.getInitiating().getMsisdn();
+            String recMsisdn = call.getReceiving().getMsisdn();
+
+            List<CallEntity> initList = cdrMap.get(initMsisdn);
+            List<CallEntity> recList = cdrMap.get(recMsisdn);
+
+            if (validatedCall(initList, call) || validatedCall(recList, call)) {
+                continue; // Пропускаем конфликтующие звонки
             }
-            List<CallEntity> recList = cdrMap.getOrDefault(c.getReceiving().getMsisdn(), new ArrayList<>());
-            if (validatedCall(recList, c)) {
-                continue;
-            }
+
             approvedCalls++;
 
-            if (c.getStartCall().getDayOfYear() != c.getEndCall().getDayOfYear()) {
-                LocalDateTime ldtEnd = c.getEndCall();
-                LocalDateTime midnight = ldtEnd.toLocalDate().atStartOfDay();
+            if (call.getStartCall().getDayOfYear() != call.getEndCall().getDayOfYear()) {
+                LocalDateTime midnight = call.getEndCall().toLocalDate().atStartOfDay();
 
-                CallEntity beforeMidnight = new CallEntity(null, c.getInitiating(), c.getReceiving(), c.getStartCall(), midnight);
-                processSingleCall(beforeMidnight, initList, recList, cdrMap);
+                CallEntity beforeMidnight = new CallEntity(
+                        null, call.getInitiating(), call.getReceiving(),
+                        call.getStartCall(), midnight
+                );
+                processSingleCall(beforeMidnight, cdrMap);
 
-                CallEntity afterMidnight = new CallEntity(null, c.getInitiating(), c.getReceiving(), midnight, c.getEndCall());
-                processSingleCall(afterMidnight, initList, recList, cdrMap);
-
+                CallEntity afterMidnight = new CallEntity(
+                        null, call.getInitiating(), call.getReceiving(),
+                        midnight, call.getEndCall()
+                );
+                processSingleCall(afterMidnight, cdrMap);
             } else {
-                processSingleCall(c, initList, recList, cdrMap);
+                processSingleCall(call, cdrMap);
             }
 
-            callRepo.saveAndFlush(c);
-
-
+            callRepo.saveAndFlush(call);
         }
+
         return approvedCalls;
     }
 
-    private void processSingleCall(CallEntity call, List<CallEntity> initList, List<CallEntity> recList, Map<String, List<CallEntity>> cdrMap) {
-        initList.add(call);
-        recList.add(call);
-
-        checkAndSendReport(call, recList, initList);
 
 
+    private void processSingleCall(CallEntity call, ConcurrentHashMap<String, List<CallEntity>> cdrMap) {
+        cdrMap.computeIfPresent(call.getInitiating().getMsisdn(), (k, v) -> {
+            v.add(call);
+            return v;
+        });
+
+        cdrMap.computeIfPresent(call.getReceiving().getMsisdn(), (k, v) -> {
+            v.add(call);
+            return v;
+        });
+
+        checkAndSendReport(call, cdrMap);
     }
 
-    private void checkAndSendReport(CallEntity call, List<CallEntity> initList, List<CallEntity> recList) {
-        if (initList.size() == 10) {
-            cdrService.sendCdrReport(call.getInitiating().getMsisdn(), initList);
-            initList.clear();
+    private void checkAndSendReport(CallEntity call, ConcurrentHashMap<String, List<CallEntity>> cdrMap) {
+        String initMsisdn = call.getInitiating().getMsisdn();
+        List<CallEntity> initList = cdrMap.get(initMsisdn);
 
+        if (initList != null && initList.size() >= 10) {
+            cdrService.sendCdrReport(initMsisdn, new ArrayList<>(initList));
+            initList.clear();
         }
-        if (recList.size() == 10) {
-            cdrService.sendCdrReport(call.getReceiving().getMsisdn(), recList);
+
+        String recMsisdn = call.getReceiving().getMsisdn();
+        List<CallEntity> recList = cdrMap.get(recMsisdn);
+
+        if (recList != null && recList.size() >= 10) {
+            cdrService.sendCdrReport(recMsisdn, new ArrayList<>(recList));
             recList.clear();
         }
     }
 
     boolean validatedCall(List<CallEntity> callList, CallEntity call) {
-        return !callList.isEmpty() && callList.get(callList.size() - 1).getEndCall().isAfter(call.getStartCall());
+        return callList.stream().anyMatch(existingCall ->
+                existingCall.getEndCall().isAfter(call.getStartCall()) &&
+                        existingCall.getStartCall().isBefore(call.getEndCall())
+        );
     }
+
 
 }
 //TODO: Напиши человеческие юниты, вроде на данный момент все работает,

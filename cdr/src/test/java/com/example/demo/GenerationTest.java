@@ -1,7 +1,7 @@
 //package com.example.demo;
 //
-//import com.example.demo.entity.SubscriberEntity;
-//import com.example.demo.repository.SubsRepo;
+//import com.example.demo.brtApp.entity.SubscriberEntity;
+//import com.example.demo.brtApp.repository.SubsRepo;
 //import com.example.demo.services.GenerationService;
 //import org.junit.jupiter.api.Test;
 //import org.springframework.beans.factory.annotation.Autowired;

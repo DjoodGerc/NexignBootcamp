@@ -1,9 +1,9 @@
 //package com.example.demo;
 //
-//import com.example.demo.entity.CallEntity;
-//import com.example.demo.entity.SubscriberEntity;
-//import com.example.demo.repository.CallRepo;
-//import com.example.demo.repository.SubsRepo;
+//import com.example.demo.brtApp.entity.CallEntity;
+//import com.example.demo.brtApp.entity.SubscriberEntity;
+//import com.example.demo.brtApp.repository.CallRepo;
+//import com.example.demo.brtApp.repository.SubsRepo;
 //import com.example.demo.services.CdrService;
 //import org.junit.jupiter.api.Test;
 //import org.springframework.beans.factory.annotation.Autowired;

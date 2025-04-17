@@ -1,7 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.ReportInputData;
-import com.example.demo.dto.UdrDto;
 import com.example.demo.entity.CallEntity;
 import com.example.demo.entity.SubscriberEntity;
 import com.example.demo.exception.DataAlreadyGeneratedException;
@@ -10,19 +8,13 @@ import com.example.demo.repository.SubsRepo;
 import com.example.demo.services.CdrService;
 import com.example.demo.services.GenerationService;
 import com.example.demo.services.UdrService;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * RestController

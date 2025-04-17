@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.aspectj.weaver.ast.Call;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,10 @@ public class CdrService {
 
     public void sendCdrReport(String msisdn, List<CallEntity> callEntities){
         List<CdrDto> cdrDtos = mapper.callEntityListToDto(callEntities, msisdn);
+        System.out.println(msisdn);
+        for (CallEntity cdrDto: callEntities) {
+            System.out.println(cdrDto);
+        }
         rmqProducer.sendJsonMassage(cdrDtos);
     }
 
