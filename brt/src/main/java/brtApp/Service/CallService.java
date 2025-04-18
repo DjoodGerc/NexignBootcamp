@@ -57,7 +57,7 @@ public class CallService {
 
         callRepository.saveAndFlush(callEntity);
 
-        balanceChangesService.saveChangeEntity(hrsRetrieveDto,subscriber);
+        balanceChangesService.saveChangeEntity(hrsRetrieveDto,subscriber,callEntity.getEndCall().plusMinutes(2));
 
         return hrsRetrieveDto;
 
@@ -65,4 +65,4 @@ public class CallService {
 
 
 }
-//ToDO: разобраться какое время ставим в изменениях и как обрабатывать помесячные списания
+//ToDO: и как обрабатывать помесячные списания

@@ -5,9 +5,7 @@ import com.example.demo.entity.SubscriberEntity;
 import com.example.demo.exception.DataAlreadyGeneratedException;
 import com.example.demo.repository.CallRepo;
 import com.example.demo.repository.SubsRepo;
-import com.example.demo.services.CdrService;
 import com.example.demo.services.GenerationService;
-import com.example.demo.services.UdrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +25,7 @@ public class CdrController {
     @Autowired
     GenerationService generationService;
     @Autowired
-    UdrService udrService;
-    @Autowired
     SubsRepo subsRepo;
-    @Autowired
-    CdrService cdrService;
 
     //для тестов
     @GetMapping(value = "/getSubs")

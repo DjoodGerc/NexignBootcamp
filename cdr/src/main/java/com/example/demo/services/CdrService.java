@@ -29,18 +29,12 @@ import java.util.UUID;
 @Service
 public class CdrService {
     @Autowired
-    CallRepo callRepo;
-    @Autowired
     MyMapper mapper;
     @Autowired
     RmqProducer rmqProducer;
 
     public void sendCdrReport(String msisdn, List<CallEntity> callEntities){
         List<CdrDto> cdrDtos = mapper.callEntityListToDto(callEntities, msisdn);
-        System.out.println(msisdn);
-        for (CallEntity cdrDto: callEntities) {
-            System.out.println(cdrDto);
-        }
         rmqProducer.sendJsonMassage(cdrDtos);
     }
 

@@ -22,10 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * служебный класс для генерации
- * generateSubs(int nSubs) - метод для генерации абонентов (и сохранения в бд) (можно добавить генерацию с реальными кодами операторов)
- * generateCdr() - метод для генерации cdr (и сохранения в бд) (случайное кол-во записей за год (от 1 до 5000 /можно вынести в параметр метода/))
- * <p>
- * !!! заметил, что абоненты могут генерироваться не случайные, не успею поправить.
+ *
  */
 @Service
 public class GenerationService {
@@ -69,10 +66,8 @@ public class GenerationService {
             throw new RuntimeException("Thread interrupted", e);
         }
 
-        // Сортируем звонки по времени начала
         calls.sort(Comparator.comparing(CallEntity::getStartCall));
 
-        // Используем ConcurrentHashMap для потокобезопасности
         ConcurrentHashMap<String, List<CallEntity>> cdrMap = new ConcurrentHashMap<>();
         allSubs.forEach(sub -> cdrMap.put(sub.getMsisdn(), new ArrayList<>()));
 
@@ -85,7 +80,7 @@ public class GenerationService {
             List<CallEntity> recList = cdrMap.get(recMsisdn);
 
             if (validatedCall(initList, call) || validatedCall(recList, call)) {
-                continue; // Пропускаем конфликтующие звонки
+                continue;
             }
 
             approvedCalls++;
