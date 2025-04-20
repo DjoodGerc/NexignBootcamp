@@ -23,6 +23,13 @@ public class HrsRest {
 //                .body(HrsRetrieveDto.class);
 
     }
+    public HrsRetrieveDto getMonthTariffFeeAndMinutes(long tariffId){
+        return new HrsRetrieveDto(0L,0.0d);
+//        HrsRetrieveDto hrsRetrieveDto=restClient.get()
+//                .uri("getTariffInfo/{id}")
+//                .retrieve()
+//                .body(HrsRetrieveDto.class);
+    }
 
 
 }

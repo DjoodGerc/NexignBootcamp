@@ -17,6 +17,8 @@ public class BalanceChangesService {
     ChangeTypeRepository changeTypeRepository;
     @Autowired
     BalanceChangesRepository balanceChangesRepository;
+
+
     public BalanceChangesEntity saveChangeEntity(HrsRetrieveDto hrsRetrieveDto, SubscriberEntity subscriberEntity,LocalDateTime date) {
         BalanceChangesEntity balanceChangesEntity = new BalanceChangesEntity();
         ChangeTypeEntity changeTypeEntity = changeTypeRepository.findById(hrsRetrieveDto.getBalanceChange()> 0.0d ? 1L : 2L).orElseThrow();

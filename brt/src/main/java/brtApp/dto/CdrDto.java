@@ -16,8 +16,8 @@ public class CdrDto {
     LocalDateTime startDate;
     LocalDateTime endDate;
 
-
     public String getOwner(){
+
         if (this.getFlag().equals("01")){
             return this.getInitiator();
         }

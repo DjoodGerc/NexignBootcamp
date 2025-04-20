@@ -29,9 +29,12 @@ public class SubscriberEntity {
     @JoinColumn(name = "tariff_id")
     private TariffEntity tariff;
 
+
+    @Column(name = "last_month_tariffication_date")
+    private LocalDateTime lastMonthTarifficationDate;
+
     @Column(name = "balance")
     private Double balance;
-
 
     @Column(name = "registration_date")
     private LocalDateTime registrationDate;
@@ -45,13 +48,13 @@ public class SubscriberEntity {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    public Double changeBalance(double value){
-        this.balance+=value;
+    public Double changeBalance(double value) {
+        this.balance += value;
         return this.balance;
     }
 
-    public Long changeTariffBalance(long value){
-        this.tariffBalance+=value;
+    public Long changeTariffBalance(long value) {
+        this.tariffBalance += value;
         return this.tariffBalance;
     }
 

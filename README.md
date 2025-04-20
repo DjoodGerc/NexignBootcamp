@@ -6,15 +6,17 @@ Spring H2 Liquibase Lombok Mapstruct Jackson Swagger
 ```
 docker compose up
 ```
-1) CDR:
+1) CDR
+  
 Генерация звонков между заранее определенными пользователями, для последующей отправки в BRT.
 
+![img.png](images/img_cdr_db.png)
 
 RabbitMQ management:
 ```
 http://localhost:15672/
 ```
-login: user
+username: user  
 password: password
 
 port: 8080  
@@ -34,7 +36,7 @@ http://localhost:8080/swagger-ui/index.html
 2) BRT
 
 Получение и обработка CDR отчетов, тарификация пользователей  
-  
+![img.png](images/img_brt_db.png)
 подключение к postgres:  
 username: user  
 password: password  
@@ -55,3 +57,7 @@ http://localhost:8081/swagger-ui/index.html
 подряд обрабатываем сообщения и отправляем данные в HRS, получаем как ответ данные о тарификации, меняем баланс, сохраняем звонок, сохраняем изменения баланса.
   
 ! датой списания после очередного звонка (если списание имеет место) ставится дата окончания звонка + 2 минуты !
+
+Если дата звонка переваливает за дату помесячной тарификации, то сначала проводится помесячная тарификация (если она подразумевается в тарифе абонента).  
+дата проверяется по полю "last_month_tarification_date" в таблице subscriber.
+

@@ -24,6 +24,10 @@ public class TariffEntity {
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
+    @ManyToOne
+    @JoinColumn(name = "tariffication_type_id")
+    private TarifficationType tarifficationType;
+
     @Column(name = "description", length = 255)
     private String description;
 

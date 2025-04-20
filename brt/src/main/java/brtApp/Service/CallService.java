@@ -5,8 +5,6 @@ import brtApp.dto.HrsCallDto;
 import brtApp.dto.HrsRetrieveDto;
 import brtApp.entity.CallEntity;
 import brtApp.entity.SubscriberEntity;
-import brtApp.repository.BalanceChangesRepository;
-import brtApp.repository.ChangeTypeRepository;
 import lombok.extern.slf4j.Slf4j;
 import brtApp.mapper.MyMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +28,8 @@ public class CallService {
     CallRepository callRepository;
     @Autowired
     BalanceChangesService balanceChangesService;
+
+    //Обрабатываем cdr отчет
     public List<HrsRetrieveDto> processCdrList(List<CdrDto> cdrDtoList) {
         String ownerMsisdn = cdrDtoList.get(0).getOwner();
         try {
@@ -46,11 +46,20 @@ public class CallService {
         return changeValues;
 
     }
-
+    //Обрабатываем звонки
     private HrsRetrieveDto processSingleCdr(CdrDto cdrDto) {
-
-
         CallEntity callEntity=mapper.cdrDtoToCallEntity(cdrDto);
+
+        if (callEntity.getSubscriber().getTariff().getTarifficationType().getId()==2) {
+            try{
+                callEntity.setSubscriber(subscriberService.monthTariffication(callEntity.getSubscriber(), callEntity.getStartCall()));
+                log.info("Monthly tariffication passed successfully");
+            }
+            catch (Exception e){
+                log.warn(e.getMessage());
+            }
+        }
+
         HrsCallDto hrsCallDto=mapper.callEntityToHrsCallDto(callEntity);
         HrsRetrieveDto hrsRetrieveDto=hrsRest.hrsProcessCall(hrsCallDto);
         SubscriberEntity subscriber=subscriberService.changeBalance(callEntity.getSubscriber(),hrsRetrieveDto);
