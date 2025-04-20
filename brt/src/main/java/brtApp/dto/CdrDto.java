@@ -16,12 +16,11 @@ public class CdrDto {
     LocalDateTime startDate;
     LocalDateTime endDate;
 
-    public String getOwner(){
+    public String getOwner() {
 
-        if (this.getFlag().equals("01")){
+        if (this.getFlag().equals("01")) {
             return this.getInitiator();
-        }
-        else{
+        } else {
             return this.getReceiver();
         }
     }

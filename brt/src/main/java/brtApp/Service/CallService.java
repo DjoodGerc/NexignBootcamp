@@ -38,35 +38,35 @@ public class CallService {
             log.warn(ex.getMessage());
             return null;
         }
-        List<HrsRetrieveDto> changeValues =new ArrayList<>();
-        for (CdrDto cdrDto: cdrDtoList){
+        List<HrsRetrieveDto> changeValues = new ArrayList<>();
+        for (CdrDto cdrDto : cdrDtoList) {
             changeValues.add(processSingleCdr(cdrDto));
         }
 
         return changeValues;
 
     }
+
     //Обрабатываем звонки
     private HrsRetrieveDto processSingleCdr(CdrDto cdrDto) {
-        CallEntity callEntity=mapper.cdrDtoToCallEntity(cdrDto);
+        CallEntity callEntity = mapper.cdrDtoToCallEntity(cdrDto);
 
-        if (callEntity.getSubscriber().getTariff().getTarifficationType().getId()==2) {
-            try{
+        if (callEntity.getSubscriber().getTariff().getTarifficationType().getId() == 2) {
+            try {
                 callEntity.setSubscriber(subscriberService.monthTariffication(callEntity.getSubscriber(), callEntity.getStartCall()));
                 log.info("Monthly tariffication passed successfully");
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 log.warn(e.getMessage());
             }
         }
 
-        HrsCallDto hrsCallDto=mapper.callEntityToHrsCallDto(callEntity);
-        HrsRetrieveDto hrsRetrieveDto=hrsRest.hrsProcessCall(hrsCallDto);
-        SubscriberEntity subscriber=subscriberService.changeBalance(callEntity.getSubscriber(),hrsRetrieveDto);
+        HrsCallDto hrsCallDto = mapper.callEntityToHrsCallDto(callEntity);
+        HrsRetrieveDto hrsRetrieveDto = hrsRest.hrsProcessCall(hrsCallDto);
+        SubscriberEntity subscriber = subscriberService.changeBalance(callEntity.getSubscriber(), hrsRetrieveDto);
 
         callRepository.saveAndFlush(callEntity);
 
-        balanceChangesService.saveChangeEntity(hrsRetrieveDto,subscriber,callEntity.getEndCall().plusMinutes(2));
+        balanceChangesService.saveChangeEntity(hrsRetrieveDto, subscriber, callEntity.getEndCall().plusMinutes(2));
 
         return hrsRetrieveDto;
 

@@ -17,15 +17,8 @@ public class BrtController {
 
     @PostMapping(value = "/processCdrList")
     public ResponseEntity<List<HrsRetrieveDto>> processCdrList(@RequestBody List<CdrDto> cdrDtoList) {
-        List<HrsRetrieveDto> changes=callService.processCdrList(cdrDtoList);
+        List<HrsRetrieveDto> changes = callService.processCdrList(cdrDtoList);
         return new ResponseEntity<>(changes, HttpStatus.OK);
     }
-    @GetMapping(name = "/get",value = "/get")
-    public ResponseEntity<?> get(){
-        return new ResponseEntity<>("все ок", HttpStatus.OK);
-    }
-    @GetMapping(value = "/")
-    public ResponseEntity<String> m(){
-        return new ResponseEntity<>("все ок", HttpStatus.OK);
-    }
+
 }

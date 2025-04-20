@@ -14,8 +14,8 @@ public class HrsRest {
 
     private final RestClient restClient = RestClient.create(hrsUrl);
 
-    public HrsRetrieveDto hrsProcessCall(HrsCallDto hrsCallDto){
-        return new HrsRetrieveDto(0L,0d);
+    public HrsRetrieveDto hrsProcessCall(HrsCallDto hrsCallDto) {
+        return new HrsRetrieveDto(0L, 0d);
 //        HrsRetrieveDto hrsRetrieveDto=restClient.post()
 //                .uri("processCall")
 //                .body(hrsCallDto)
@@ -23,8 +23,9 @@ public class HrsRest {
 //                .body(HrsRetrieveDto.class);
 
     }
-    public HrsRetrieveDto getMonthTariffFeeAndMinutes(long tariffId){
-        return new HrsRetrieveDto(0L,0.0d);
+
+    public HrsRetrieveDto getMonthTariffFeeAndMinutes(long tariffId) {
+        return new HrsRetrieveDto(0L, 0.0d);
 //        HrsRetrieveDto hrsRetrieveDto=restClient.get()
 //                .uri("getTariffInfo/{id}")
 //                .retrieve()

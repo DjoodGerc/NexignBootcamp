@@ -30,22 +30,21 @@ public class SubscriberService {
     //Изменение баланса
     public SubscriberEntity changeBalance(SubscriberEntity subscriberEntity, HrsRetrieveDto hrsRetrieveDto) {
         subscriberEntity.changeBalance(hrsRetrieveDto.getBalanceChange());
-        subscriberEntity.changeBalance(hrsRetrieveDto.getTariffBalanceChange());
+        subscriberEntity.changeTariffBalance(hrsRetrieveDto.getTariffBalanceChange());
         return subscriberRepository.saveAndFlush(subscriberEntity);
     }
 
     //Обработка помесячной тарификации
     public SubscriberEntity monthTariffication(SubscriberEntity subscriber, LocalDateTime startCall) {
-        Optional<LocalDateTime> optional=checkMonthTarifficationDate(startCall, subscriber.getLastMonthTarifficationDate());
-        if (optional.isEmpty()){
+        Optional<LocalDateTime> optional = checkMonthTarifficationDate(startCall, subscriber.getLastMonthTarifficationDate());
+        if (optional.isEmpty()) {
             throw new RuntimeException("it's too early for tariffication");
-        }
-        else{
-            LocalDateTime newDate=optional.get();
+        } else {
+            LocalDateTime newDate = optional.get();
             subscriber.setLastMonthTarifficationDate(newDate);
-            HrsRetrieveDto hrsRetrieveDto=hrsRest.getMonthTariffFeeAndMinutes(subscriber.getTariff().getId());
-            subscriber=changeBalance(subscriber,hrsRetrieveDto);
-            balanceChangesService.saveChangeEntity(hrsRetrieveDto,subscriber,newDate);
+            HrsRetrieveDto hrsRetrieveDto = hrsRest.getMonthTariffFeeAndMinutes(subscriber.getTariff().getId());
+            subscriber = changeBalance(subscriber, hrsRetrieveDto);
+            balanceChangesService.saveChangeEntity(hrsRetrieveDto, subscriber, newDate);
         }
         return subscriber;
     }

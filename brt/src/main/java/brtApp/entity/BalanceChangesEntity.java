@@ -14,21 +14,21 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BalanceChangesEntity {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        @ManyToOne
-        @JoinColumn(name = "subscriber_id")
-        private SubscriberEntity subscriber;
+    @ManyToOne
+    @JoinColumn(name = "subscriber_id")
+    private SubscriberEntity subscriber;
 
-        @Column(name = "value")
-        private Double value;
+    @Column(name = "value")
+    private Double value;
 
-        @Column(name = "date")
-        private LocalDateTime date;
+    @Column(name = "date")
+    private LocalDateTime date;
 
-        @ManyToOne
-        @JoinColumn(name = "change_type_id")
-        private ChangeTypeEntity changeType;
-    }
+    @ManyToOne
+    @JoinColumn(name = "change_type_id")
+    private ChangeTypeEntity changeType;
+}
