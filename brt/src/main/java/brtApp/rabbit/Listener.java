@@ -21,7 +21,7 @@ public class Listener {
     CallService callService;
 
     @RabbitListener(queues = "${spring.rabbitmq.template.queue}")
-    public void listener(@Payload List<CdrDto> cdrDtos) {
+    public void listener(@Payload List<CdrDto> cdrDtos) throws Exception {
         callService.processCdrList(cdrDtos);
     }
 

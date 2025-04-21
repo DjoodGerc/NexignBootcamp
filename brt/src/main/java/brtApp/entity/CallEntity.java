@@ -2,6 +2,7 @@ package brtApp.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Table(name = "call")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class CallEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

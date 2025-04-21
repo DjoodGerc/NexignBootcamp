@@ -1,6 +1,7 @@
 package brtApp.Service;
 
 import brtApp.dto.HrsRetrieveDto;
+import brtApp.entity.BalanceChangeEnum;
 import brtApp.entity.BalanceChangesEntity;
 import brtApp.entity.ChangeTypeEntity;
 import brtApp.entity.SubscriberEntity;
@@ -21,7 +22,7 @@ public class BalanceChangesService {
 
     public BalanceChangesEntity saveChangeEntity(HrsRetrieveDto hrsRetrieveDto, SubscriberEntity subscriberEntity, LocalDateTime date) {
         BalanceChangesEntity balanceChangesEntity = new BalanceChangesEntity();
-        ChangeTypeEntity changeTypeEntity = changeTypeRepository.findById(hrsRetrieveDto.getBalanceChange() > 0.0d ? 1L : 2L).orElseThrow();
+        ChangeTypeEntity changeTypeEntity = changeTypeRepository.findById(hrsRetrieveDto.getBalanceChange() > 0.0d ? BalanceChangeEnum.INCREASE.getId() : BalanceChangeEnum.DECREASE.getId()).orElseThrow();
 
         balanceChangesEntity.setValue(hrsRetrieveDto.getBalanceChange());
         balanceChangesEntity.setDate(date);

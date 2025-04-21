@@ -1,25 +1,19 @@
 CREATE TABLE call_type(
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name varchar(255)
 
 );
 
 CREATE TABLE change_type(
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name varchar(255)
 );
 
-CREATE TABLE tariff (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255),
-    is_active BOOLEAN,
-    creation_date TIMESTAMP,
-    description VARCHAR(255)
-);
+
 
 -- Create subscriber table
 CREATE TABLE subscriber (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255),
     msisdn VARCHAR(11),
     tariff_id INTEGER,
@@ -27,13 +21,12 @@ CREATE TABLE subscriber (
     registration_date TIMESTAMP,
     passport_data VARCHAR(10),
     tariff_balance INTEGER,
-    is_active BOOLEAN,
-    FOREIGN KEY (tariff_id) REFERENCES tariff(id)
+    is_active BOOLEAN
 );
 
 -- Create call table
 CREATE TABLE  call (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     subscriber_id INT,
     opponent_msisdn varchar(11),
     start_call TIMESTAMP,
@@ -43,12 +36,11 @@ CREATE TABLE  call (
     is_romashka_call BOOLEAN,
     FOREIGN KEY (subscriber_id) REFERENCES subscriber(id),
     FOREIGN KEY (call_type_id) REFERENCES call_type(id)
-
 );
 
 -- Create balance_changes table
 CREATE TABLE balance_changes (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     subscriber_id INT,
     value DECIMAL,
     date TIMESTAMP,

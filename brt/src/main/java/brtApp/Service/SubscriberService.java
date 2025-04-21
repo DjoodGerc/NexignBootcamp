@@ -1,8 +1,13 @@
 package brtApp.Service;
 
+import brtApp.dto.CdrDto;
 import brtApp.dto.HrsRetrieveDto;
 import brtApp.entity.SubscriberEntity;
+import brtApp.exception.NotRomashkaException;
+import brtApp.exception.TooEarlyForTarifficationException;
 import brtApp.restInteraction.HrsRest;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import brtApp.repository.SubscriberRepository;
@@ -12,6 +17,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class SubscriberService {
     @Autowired
     SubscriberRepository subscriberRepository;
@@ -20,9 +26,16 @@ public class SubscriberService {
     @Autowired
     HrsRest hrsRest;
 
+    public SubscriberEntity findSubscriberByOwner(CdrDto dto) {
+        return subscriberRepository.findByMsisdn(dto.getOwner())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Subscriber not found with MSISDN: " + dto.getOwner()
+                ));
+    }
+
     public boolean validateSubscriber(String msisdn) {
         if (!subscriberRepository.findByMsisdn(msisdn).isPresent()) {
-            throw new RuntimeException("Not Romashka subscriber");
+            throw new NotRomashkaException("Not Romashka subscriber");
         }
         return true;
     }
@@ -35,33 +48,44 @@ public class SubscriberService {
     }
 
     //Обработка помесячной тарификации
-    public SubscriberEntity monthTariffication(SubscriberEntity subscriber, LocalDateTime startCall) {
-        Optional<LocalDateTime> optional = checkMonthTarifficationDate(startCall, subscriber.getLastMonthTarifficationDate());
-        if (optional.isEmpty()) {
-            throw new RuntimeException("it's too early for tariffication");
-        } else {
-            LocalDateTime newDate = optional.get();
-            subscriber.setLastMonthTarifficationDate(newDate);
-            HrsRetrieveDto hrsRetrieveDto = hrsRest.getMonthTariffFeeAndMinutes(subscriber.getTariff().getId());
-            subscriber = changeBalance(subscriber, hrsRetrieveDto);
+    public SubscriberEntity monthTariffication(SubscriberEntity subscriber, LocalDateTime startCall)  {
+        LocalDateTime newDate = checkMonthTarifficationDate(startCall, subscriber);
+
+        subscriber.setLastMonthTarifficationDate(newDate);
+        HrsRetrieveDto hrsRetrieveDto = hrsRest.getMonthTariffFeeAndMinutes(subscriber.getTariffId());
+        subscriber = changeBalance(subscriber, hrsRetrieveDto);
+        if (hrsRetrieveDto.getBalanceChange() > 0) {
             balanceChangesService.saveChangeEntity(hrsRetrieveDto, subscriber, newDate);
         }
+        log.info("Month tariffication passed successfully");
+
         return subscriber;
     }
 
 
     //Проверяем пора ли тарифицировать и устанавливаем новую дату
-    private Optional<LocalDateTime> checkMonthTarifficationDate(LocalDateTime startCall, LocalDateTime lastTariffication) {
-
-        //если с даты последней тарификации не прошел месяц
-        if (startCall.isBefore(lastTariffication.plusMonths(1))) {
-            return Optional.empty();
+    private LocalDateTime checkMonthTarifficationDate(LocalDateTime startCall, SubscriberEntity subscriber) {
+        LocalDateTime lastTariffication=subscriber.getLastMonthTarifficationDate();
+        if (lastTariffication == null){
+            LocalDateTime registrationDate=subscriber.getRegistrationDate();
+            long daysSinceRegistration = ChronoUnit.DAYS.between(registrationDate, startCall);
+            long fullPeriods = daysSinceRegistration / 30; // количество полных 30-дневных периодов
+            return registrationDate.plusDays(30 * fullPeriods);
         }
+        else {
+            if (startCall.isBefore(lastTariffication.plusDays(30))) {
+                throw new TooEarlyForTarifficationException(
+                        "It's too early for tariffication. Next tariffication available after: "
+                                + lastTariffication.plusDays(30)
+                );
+            }
 
-        long monthsPassed = ChronoUnit.MONTHS.between(lastTariffication, startCall);
+            long daysPassed = ChronoUnit.DAYS.between(lastTariffication, startCall);
+            long fullPeriods = daysPassed / 30;
 
-        LocalDateTime newTarifficationDate = lastTariffication.plusMonths(monthsPassed);
-        return Optional.of(newTarifficationDate);
+            return lastTariffication.plusDays(30 * fullPeriods);
+
+        }
     }
 
 }

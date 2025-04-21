@@ -1,6 +1,8 @@
 package brtApp.dto;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,11 +13,21 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CdrDto {
+    @Pattern(regexp = "01|02", message = "Flag must be either '01' or '02'")
     String flag;
+    @Pattern(regexp = "^7\\d{10}$", message = "Initiator must be 11 digits starting with 7")
     String initiator;
+    @Pattern(regexp = "^7\\d{10}$", message = "Receiver must be 11 digits starting with 7")
     String receiver;
+    @NotNull
     LocalDateTime startDate;
+    @NotNull
     LocalDateTime endDate;
+
+    @AssertTrue(message = "Start date must be before end date")
+    private boolean isStartDateBeforeEndDate() {
+        return startDate.isBefore(endDate);
+    }
 
     public String getOwner() {
 

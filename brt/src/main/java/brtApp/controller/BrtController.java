@@ -16,7 +16,7 @@ public class BrtController {
     CallService callService;
 
     @PostMapping(value = "/processCdrList")
-    public ResponseEntity<List<HrsRetrieveDto>> processCdrList(@RequestBody List<CdrDto> cdrDtoList) {
+    public ResponseEntity<List<HrsRetrieveDto>> processCdrList(@RequestBody List<CdrDto> cdrDtoList) throws Exception {
         List<HrsRetrieveDto> changes = callService.processCdrList(cdrDtoList);
         return new ResponseEntity<>(changes, HttpStatus.OK);
     }

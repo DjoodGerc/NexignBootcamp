@@ -25,9 +25,8 @@ public class SubscriberEntity {
     @Column(name = "msisdn", length = 11)
     private String msisdn;
 
-    @ManyToOne
-    @JoinColumn(name = "tariff_id")
-    private TariffEntity tariff;
+    @Column(name ="tariff_id")
+    private Long tariffId;
 
 
     @Column(name = "last_month_tariffication_date")
