@@ -48,14 +48,6 @@ public class CdrController {
         return new ResponseEntity<>(callEntities, HttpStatus.OK);
     }
 
-
-    /**
-     * Генерация звонков.
-     *
-     * @param bot - нижнее значение генерации - необязательный параметр(по умолчанию 1)
-     * @param top - верхнее значение генерации - необязательный параметр(по умолчанию 5000)
-     * @return ResponseEntity
-     */
     @PostMapping(value = "/generate")
     @ResponseBody
     public ResponseEntity<?> getGenerate(@RequestParam(name = "bot", defaultValue = "1", required = false) Optional<Integer> bot, @RequestParam(name = "top", required = false,defaultValue = "5000") Optional<Integer> top) throws DataAlreadyGeneratedException {

@@ -1,5 +1,5 @@
 Nx Bootcamp  
-Spring H2 Liquibase Lombok Mapstruct Jackson Swagger
+Spring H2 Postgres Liquibase Lombok Mapstruct Jackson Swagger
 
 для запуска:
 поднимаем кролика и postgres
