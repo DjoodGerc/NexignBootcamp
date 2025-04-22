@@ -38,8 +38,10 @@ public class CallService {
         String ownerMsisdn = cdrDtoList.get(0).getOwner();
         try {
             subscriberService.validateSubscriber(ownerMsisdn);
+
         } catch (Exception ex) {
             log.info(ex.getMessage());
+            return null;
         }
         List<HrsRetrieveDto> changeValues = new ArrayList<>();
         for (CdrDto cdrDto : cdrDtoList) {
