@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class CdrService {
     @Autowired
@@ -21,7 +22,6 @@ public class CdrService {
     @Autowired
     CallTypeRepository callTypeRepository;
 
-
     public CallEntity callEntityFromCdr(CdrDto cdrDto) {
         SubscriberEntity subscriber = subscriberService.findSubscriberByOwner(cdrDto);
 
@@ -30,7 +30,6 @@ public class CdrService {
         boolean isRomashkaCall = checkIsRomashkaCall(cdrDto);
 
         CallTypeEntity callType = mapFlagToCallType(cdrDto.getFlag());
-
         return CallEntity.builder()
                 .subscriber(subscriber)
                 .opponentMsisdn(opponentMsisdn)
@@ -41,7 +40,6 @@ public class CdrService {
                 .isRomashkaCall(isRomashkaCall)
                 .build();
     }
-
 
     private String mapOpponent(CdrDto dto) {
         return dto.getFlag().equals(CdrFlagEnum.INCOMING.getFlagId()) ? dto.getReceiver() : dto.getInitiator();

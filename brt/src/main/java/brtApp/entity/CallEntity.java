@@ -1,5 +1,6 @@
 package brtApp.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,12 +28,14 @@ public class CallEntity {
     private String opponentMsisdn;
 
     @Column(name = "start_call")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startCall;
 
     @Column(name = "end_call")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endCall;
 
-    @Column(name = "total_cost")
+    @Column(name = "total_cost", precision = 10, scale = 2)
     private Double totalCost;
 
     @ManyToOne

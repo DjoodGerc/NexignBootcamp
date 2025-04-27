@@ -9,9 +9,6 @@ CREATE TABLE change_type(
     name varchar(255)
 );
 
-
-
--- Create subscriber table
 CREATE TABLE subscriber (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255),
@@ -24,7 +21,6 @@ CREATE TABLE subscriber (
     is_active BOOLEAN
 );
 
--- Create call table
 CREATE TABLE  call (
     id BIGSERIAL PRIMARY KEY,
     subscriber_id INT,
@@ -38,7 +34,6 @@ CREATE TABLE  call (
     FOREIGN KEY (call_type_id) REFERENCES call_type(id)
 );
 
--- Create balance_changes table
 CREATE TABLE balance_changes (
     id BIGSERIAL PRIMARY KEY,
     subscriber_id INT,

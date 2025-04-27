@@ -2,7 +2,7 @@ package brtApp.restInteraction;
 
 import brtApp.dto.HrsCallDto;
 import brtApp.dto.HrsRetrieveDto;
-import lombok.AllArgsConstructor;
+import brtApp.exception.TarifficationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -14,22 +14,27 @@ public class HrsRest {
 
     private final RestClient restClient = RestClient.create(hrsUrl);
 
-    public HrsRetrieveDto hrsProcessCall(HrsCallDto hrsCallDto) {
-        return new HrsRetrieveDto(0L, 0d);
-//        HrsRetrieveDto hrsRetrieveDto=restClient.post()
-//                .uri("processCall")
-//                .body(hrsCallDto)
-//                .retrieve()
-//                .body(HrsRetrieveDto.class);
-
+    public HrsRetrieveDto hrsTarifficationCall(HrsCallDto hrsCallDto) {
+        HrsRetrieveDto hrsRetrieveDto=restClient.post()
+                .uri("http://localhost:8082/tarifficateCall")
+                .body(hrsCallDto)
+                .retrieve()
+                .onStatus(status -> status.value() >=400, (request, response) -> {
+                    throw new TarifficationException(response.getStatusCode(),response.getStatusText());
+                })
+                .body(HrsRetrieveDto.class);
+        return  hrsRetrieveDto;
     }
 
     public HrsRetrieveDto getMonthTariffFeeAndMinutes(long tariffId) {
-        return new HrsRetrieveDto(0L, 0.0d);
-//        HrsRetrieveDto hrsRetrieveDto=restClient.get()
-//                .uri("getTariffInfo/{id}")
-//                .retrieve()
-//                .body(HrsRetrieveDto.class);
+        HrsRetrieveDto hrsRetrieveDto=restClient.get()
+                .uri("http://localhost:8082/monthTariffication/"+tariffId)
+                .retrieve()
+                .onStatus(status -> status.value() >=400, (request, response) -> {
+                    throw new TarifficationException(response.getStatusCode(),response.getStatusText());
+                })
+                .body(HrsRetrieveDto.class);
+        return hrsRetrieveDto;
     }
 
 

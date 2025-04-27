@@ -1,5 +1,6 @@
 package brtApp.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,12 +31,14 @@ public class SubscriberEntity {
 
 
     @Column(name = "last_month_tariffication_date")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastMonthTarifficationDate;
 
-    @Column(name = "balance")
+    @Column(name = "balance", precision = 10, scale = 2)
     private Double balance;
 
     @Column(name = "registration_date")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime registrationDate;
 
     @Column(name = "passport_data", length = 10)

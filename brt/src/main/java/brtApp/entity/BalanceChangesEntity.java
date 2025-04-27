@@ -1,7 +1,9 @@
 package brtApp.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "balance_changes")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class BalanceChangesEntity {
 
     @Id
@@ -22,10 +25,11 @@ public class BalanceChangesEntity {
     @JoinColumn(name = "subscriber_id")
     private SubscriberEntity subscriber;
 
-    @Column(name = "value")
+    @Column(name = "value", precision = 10, scale = 2)
     private Double value;
 
     @Column(name = "date")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime date;
 
     @ManyToOne

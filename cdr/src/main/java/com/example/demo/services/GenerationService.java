@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -70,6 +69,7 @@ public class GenerationService {
 
         ConcurrentHashMap<String, List<CallEntity>> cdrMap = new ConcurrentHashMap<>();
         allSubs.forEach(sub -> cdrMap.put(sub.getMsisdn(), new ArrayList<>()));
+        ConcurrentHashMap<String, LocalDateTime> lastCalls = new ConcurrentHashMap<>();
 
         int approvedCalls = 0;
         for (CallEntity call : calls) {
@@ -79,7 +79,7 @@ public class GenerationService {
             List<CallEntity> initList = cdrMap.get(initMsisdn);
             List<CallEntity> recList = cdrMap.get(recMsisdn);
 
-            if (validatedCall(initList, call) || validatedCall(recList, call)) {
+            if (validateCall(lastCalls, call)) {
                 continue;
             }
 
@@ -143,15 +143,21 @@ public class GenerationService {
         }
     }
 
-    boolean validatedCall(List<CallEntity> callList, CallEntity call) {
-        return callList.stream().anyMatch(existingCall ->
-                existingCall.getEndCall().isAfter(call.getStartCall()) &&
-                        existingCall.getStartCall().isBefore(call.getEndCall())
-        );
+    //Валидируем звонки true - если не подходит, false - если подходит (
+    boolean validateCall(ConcurrentHashMap<String,LocalDateTime> lastCalls,CallEntity call){
+        if (!lastCalls.getOrDefault(call.getInitiating().getMsisdn(),call.getStartCall().minusDays(1)).isBefore(call.getStartCall()) ){
+            return true;
+        }
+        if (!lastCalls.getOrDefault(call.getReceiving().getMsisdn(),call.getStartCall().minusDays(1)).isBefore(call.getStartCall())){
+            return true;
+        }
+
+        lastCalls.put(call.getReceiving().getMsisdn(),call.getEndCall());
+        lastCalls.put(call.getInitiating().getMsisdn(),call.getEndCall());
+        return false;
     }
 
 
 }
 //TODO: Напиши человеческие юниты, вроде на данный момент все работает,
-// но проверь что в brt улетают все звонки что должны улететь
-// переписать валидацию
+

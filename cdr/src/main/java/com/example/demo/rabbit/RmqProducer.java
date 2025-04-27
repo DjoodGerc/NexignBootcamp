@@ -16,9 +16,9 @@ public class RmqProducer {
     private String routingKey;
     @Value("${spring.rabbitmq.template.exchange}")
     private String exchange;
-    public void sendJsonMassage(List<CdrDto> cdrDtos){
+    public List<CdrDto> sendJsonMassage(List<CdrDto> cdrDtos){
         rabbitTemplate.convertAndSend(exchange,routingKey, cdrDtos);
-
+        return cdrDtos;
     }
 
 }

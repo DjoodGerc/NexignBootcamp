@@ -1,4 +1,6 @@
 rootProject.name = 'demo'
 include 'brt'
 include 'cdr'
+include 'crm'
+include 'hrs'
 

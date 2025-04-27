@@ -5,14 +5,7 @@ databaseChangeLog:
       failOnError: true
       validCheckSum: ANY
       changes:
-        - sqlFile: { dbms: 'postgresql,h2', path: db/changelog/updates/init.sql}
-  - changeSet:
-      id: month_tariffication
-      author: Pavel
-      failOnError: true
-      validCheckSum: ANY
-      changes:
-        - sqlFile: { dbms: 'postgresql,h2', path: db/changelog/updates/month_tariffication.sql }
+        - sqlFile: { dbms: 'postgresql,h2', path: db/changelog/updates/init.sql }
   - changeSet:
       id: insert_data
       author: Pavel

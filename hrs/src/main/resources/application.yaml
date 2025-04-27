@@ -1,14 +1,14 @@
-spring.application.name: brt
+spring.application.name: hrs
 
 server:
-  port: 8081
+  port: 8082
 
 
 spring:
 
   datasource:
     #    platform: postgres
-    url: "jdbc:postgresql://localhost:5430/brt_db"
+    url: "jdbc:postgresql://localhost:5440/hrs_db"
     username: user
     password: password
     driverClassName: org.postgresql.Driver
@@ -21,13 +21,7 @@ spring:
     enabled: true
     change-log: db/changelog/db.changelog-master.yaml
     default-schema: public
-  rabbitmq:
-    username: user
-    password: password
-    ports:
-      - "5672:5672"
-    template:
-      queue: cdr_queue
-hrs:
+
+brt:
   service:
-    url: "http://localhost:8082"
+    url: "http://localhost:8081"

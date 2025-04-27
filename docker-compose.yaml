@@ -10,16 +10,22 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
-  postgres:
+  postgresBrt:
     image: postgres:latest
     container_name: postgres_container
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: brt_db
-#      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5430:5432"
-#    volumes:
-#      - ./pgdata:/var/lib/postgresql/data/pgdata
+  postgresHrs:
+      image: postgres:latest
+      container_name: postgres_container
+      environment:
+        POSTGRES_USER: user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: hrs_db
+      ports:
+        - "5440:5432"
 

@@ -14,7 +14,6 @@ import brtApp.repository.SubscriberRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -41,20 +40,27 @@ public class SubscriberService {
     }
 
     //Изменение баланса
-    public SubscriberEntity changeBalance(SubscriberEntity subscriberEntity, HrsRetrieveDto hrsRetrieveDto) {
+    public SubscriberEntity changeBalanceCallTariffication(SubscriberEntity subscriberEntity, HrsRetrieveDto hrsRetrieveDto) {
         subscriberEntity.changeBalance(hrsRetrieveDto.getBalanceChange());
         subscriberEntity.changeTariffBalance(hrsRetrieveDto.getTariffBalanceChange());
         return subscriberRepository.saveAndFlush(subscriberEntity);
     }
 
+    public SubscriberEntity changeBalanceMonthTariffication(SubscriberEntity subscriberEntity, HrsRetrieveDto hrsRetrieveDto) {
+        subscriberEntity.changeBalance(hrsRetrieveDto.getBalanceChange());
+        subscriberEntity.setTariffBalance(hrsRetrieveDto.getTariffBalanceChange());
+        return subscriberRepository.saveAndFlush(subscriberEntity);
+    }
+
     //Обработка помесячной тарификации
-    public SubscriberEntity monthTariffication(SubscriberEntity subscriber, LocalDateTime startCall)  {
+    public SubscriberEntity monthTariffication(SubscriberEntity subscriber, LocalDateTime startCall) {
         LocalDateTime newDate = checkMonthTarifficationDate(startCall, subscriber);
 
         subscriber.setLastMonthTarifficationDate(newDate);
         HrsRetrieveDto hrsRetrieveDto = hrsRest.getMonthTariffFeeAndMinutes(subscriber.getTariffId());
-        subscriber = changeBalance(subscriber, hrsRetrieveDto);
-        if (hrsRetrieveDto.getBalanceChange() > 0) {
+        subscriber = changeBalanceMonthTariffication(subscriber, hrsRetrieveDto);
+        subscriber.setTariffBalance(hrsRetrieveDto.getTariffBalanceChange());
+        if (hrsRetrieveDto.getBalanceChange() != 0) {
             balanceChangesService.saveChangeEntity(hrsRetrieveDto, subscriber, newDate);
         }
         log.info("Month tariffication passed successfully");
@@ -65,27 +71,26 @@ public class SubscriberService {
 
     //Проверяем пора ли тарифицировать и устанавливаем новую дату
     private LocalDateTime checkMonthTarifficationDate(LocalDateTime startCall, SubscriberEntity subscriber) {
-        LocalDateTime lastTariffication=subscriber.getLastMonthTarifficationDate();
-        if (lastTariffication == null){
-            LocalDateTime registrationDate=subscriber.getRegistrationDate();
+        LocalDateTime lastTariffication = subscriber.getLastMonthTarifficationDate();
+        if (lastTariffication == null) {
+            LocalDateTime registrationDate = subscriber.getRegistrationDate();
             long daysSinceRegistration = ChronoUnit.DAYS.between(registrationDate, startCall);
             long fullPeriods = daysSinceRegistration / 30; // количество полных 30-дневных периодов
             return registrationDate.plusDays(30 * fullPeriods);
+        } else if (startCall.isBefore(lastTariffication.plusDays(30))) {
+            throw new TooEarlyForTarifficationException(
+                    "It's too early for tariffication. Next tariffication available after: "
+                            + lastTariffication.plusDays(30)
+            );
         }
-        else {
-            if (startCall.isBefore(lastTariffication.plusDays(30))) {
-                throw new TooEarlyForTarifficationException(
-                        "It's too early for tariffication. Next tariffication available after: "
-                                + lastTariffication.plusDays(30)
-                );
-            }
 
-            long daysPassed = ChronoUnit.DAYS.between(lastTariffication, startCall);
-            long fullPeriods = daysPassed / 30;
 
-            return lastTariffication.plusDays(30 * fullPeriods);
+        long daysPassed = ChronoUnit.DAYS.between(lastTariffication, startCall);
+        long fullPeriods = daysPassed / 30;
 
-        }
+        return lastTariffication.plusDays(30 * fullPeriods);
+
     }
-
 }
+
+//TODO: сделать чтобы он тарифицировал нескольок месяцев
