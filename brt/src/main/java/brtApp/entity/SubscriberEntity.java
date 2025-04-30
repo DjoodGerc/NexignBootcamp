@@ -34,7 +34,7 @@ public class SubscriberEntity {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastMonthTarifficationDate;
 
-    @Column(name = "balance", precision = 10, scale = 2)
+    @Column(name = "balance", precision = 10)
     private Double balance;
 
     @Column(name = "registration_date")

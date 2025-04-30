@@ -1,5 +1,4 @@
 
-version: '3.9'
 
 services:
   localRabbitMQ:
@@ -12,7 +11,7 @@ services:
       - 15672:15672
   postgresBrt:
     image: postgres:latest
-    container_name: postgres_container
+    container_name: postgres_brt
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -21,7 +20,7 @@ services:
       - "5430:5432"
   postgresHrs:
       image: postgres:latest
-      container_name: postgres_container
+      container_name: postgres_hrs
       environment:
         POSTGRES_USER: user
         POSTGRES_PASSWORD: password

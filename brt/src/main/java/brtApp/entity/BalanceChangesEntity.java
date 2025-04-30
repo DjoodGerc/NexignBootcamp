@@ -25,7 +25,7 @@ public class BalanceChangesEntity {
     @JoinColumn(name = "subscriber_id")
     private SubscriberEntity subscriber;
 
-    @Column(name = "value", precision = 10, scale = 2)
+    @Column(name = "value", precision = 10)
     private Double value;
 
     @Column(name = "date")

@@ -27,7 +27,7 @@ public class TariffEntity {
     String description;
 
     @OneToOne
-    @JoinColumn(name = "tariff_parametr_id", nullable = false)
-    private TariffParametrEntity tariffParametr;
+    @JoinColumn(name = "tariff_parameter_id", nullable = false)
+    private TariffParameterEntity tariffParametr;
 
 }

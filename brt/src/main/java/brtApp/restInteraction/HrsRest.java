@@ -37,5 +37,6 @@ public class HrsRest {
         return hrsRetrieveDto;
     }
 
-
 }
+
+//TODO: Eureka ApiGateway

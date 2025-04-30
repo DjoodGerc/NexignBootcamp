@@ -6,7 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum CallTypeEnum {
-    INCOMING(1L),
-    OUTGOING(2L);
+    OUTGOING(1L),
+    INCOMING(2L);
     long id;
 }

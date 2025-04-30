@@ -61,3 +61,25 @@ http://localhost:8081/swagger-ui/index.html
 Если дата звонка переваливает за дату помесячной тарификации, то сначала проводится помесячная тарификация (если она подразумевается в тарифе абонента).  
 дата проверяется по полю "last_month_tarification_date" в таблице subscriber.
 
+3) HRS
+  
+Тарификация звонков + помесячная тарификация  
+![img.png](images/hrs_img.png)  
+
+
+подключение к postgres:  
+username: user  
+password: password
+```
+http://127.0.0.1:5440/hrs_db
+```
+port:8082
+
+Swagger:
+```
+http://localhost:8082/swagger-ui/index.html
+```
+
+Алгоритм:
+
+Обрабатываем входящие звонки и помесячную тарификацию.

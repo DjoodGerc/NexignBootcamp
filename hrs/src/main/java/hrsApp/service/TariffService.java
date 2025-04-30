@@ -20,30 +20,31 @@ public class TariffService {
 
 
     public HrsFeeDto tarifficateCall(HrsCallDto hrsCallDto) {
+
         HrsFeeDto result = new HrsFeeDto();
-        long callType=hrsCallDto.getCallType();
-        boolean isRomashkaCall=hrsCallDto.isRomashkaCall();
+        long callType = hrsCallDto.getCallType();
+        boolean isRomashkaCall = hrsCallDto.isRomashkaCall();
         hrsCallDto.getBalance();
-        long tariffMinutes=hrsCallDto.getTariffBalance();
-        long callMinutes=hrsCallDto.getMinutes();
+        long tariffMinutes = hrsCallDto.getTariffBalance();
+        long callMinutes = hrsCallDto.getMinutes();
         TariffEntity tariff = getTariff(hrsCallDto.getTariffId());
 
         //безлимит
-        if (tariff.getTariffParametr().getTariffType().getId()==TariffTypeEnum.UNLIMITED.getId()){
+        if (tariff.getTariffParametr().getTariffType().getId() == TariffTypeEnum.UNLIMITED.getId()) {
             return result;
         }
         //поивентный
-        else if (tariff.getTariffParametr().getTariffType().getId()== TariffTypeEnum.EVENT.getId()){
-            result.setBalanceChange(getCallFee(tariff,callType,isRomashkaCall,callMinutes));
+        else if (tariff.getTariffParametr().getTariffType().getId() == TariffTypeEnum.EVENT.getId()) {
+            result.setBalanceChange(getCallFee(tariff, callType, isRomashkaCall, callMinutes));
         }
         //помесячный
-        else if (tariff.getTariffParametr().getTariffType().getId()== TariffTypeEnum.MONTH.getId()) {
-            if (tariffMinutes != 0 && callMinutes > tariffMinutes) {
-                result.setTariffBalanceChange(tariffMinutes);
+        else if (tariff.getTariffParametr().getTariffType().getId() == TariffTypeEnum.MONTH.getId()) {
+            if (callMinutes > tariffMinutes) {
+                result.setTariffBalanceChange(-tariffMinutes);
                 result.setBalanceChange(getCallFee(tariff, callType, isRomashkaCall, callMinutes - tariffMinutes));
                 return result;
             } else {
-                result.setTariffBalanceChange(callMinutes);
+                result.setTariffBalanceChange(-callMinutes);
             }
         }
 
@@ -58,15 +59,15 @@ public class TariffService {
         double callprice;
         if (callType == CallTypeEnum.INCOMING.getId()) {
             if (isRomashkaCall) {
-                callprice = tariff.getTariffParametr().getInitiatingInternalCallCost() * minutes;
+                callprice = -tariff.getTariffParametr().getReceivingInternalCallCost() * minutes;
             } else {
-                callprice = tariff.getTariffParametr().getReceivingInternalCallCost() * minutes;
+                callprice = -tariff.getTariffParametr().getReceivingExternalCallCost() * minutes;
             }
         } else if (callType == CallTypeEnum.OUTGOING.getId()) {
             if (isRomashkaCall) {
-                callprice = tariff.getTariffParametr().getInitiatingExternalCallCost() * minutes;
+                callprice = -tariff.getTariffParametr().getInitiatingInternalCallCost() * minutes;
             } else {
-                callprice = tariff.getTariffParametr().getReceivingExternalCallCost() * minutes;
+                callprice = -tariff.getTariffParametr().getInitiatingExternalCallCost() * minutes;
             }
         } else {
             throw new EntityNotFoundException("Неизвестный тип звонка");
@@ -76,14 +77,13 @@ public class TariffService {
 
 
     public HrsFeeDto monthTariffication(Long id) throws MonthTarifficationIsNotAllowedForEventTariffException {
-        TariffEntity tariff = tariffRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Такого тарифа не существует"));
-        HrsFeeDto result=new HrsFeeDto();
-        if (tariff.getTariffParametr().getTariffType().getId()==TariffTypeEnum.EVENT.getId()){
-            throw new MonthTarifficationIsNotAllowedForEventTariffException(HttpStatus.CONFLICT,"Помесячная тарификация не предрставляется для этого тарифа");
-        }
-        else{
+        TariffEntity tariff = tariffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Такого тарифа не существует"));
+        HrsFeeDto result = new HrsFeeDto();
+        if (tariff.getTariffParametr().getTariffType().getId() == TariffTypeEnum.EVENT.getId()) {
+            throw new MonthTarifficationIsNotAllowedForEventTariffException(HttpStatus.CONFLICT, "Помесячная тарификация не предрставляется для этого тарифа");
+        } else {
 
-            result.setBalanceChange(tariff.getTariffParametr().getMonthlyFee());
+            result.setBalanceChange(-tariff.getTariffParametr().getMonthlyFee());
             result.setTariffBalanceChange(tariff.getTariffParametr().getMonthlyMinuteCapacity());
         }
         return result;

@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HrsFeeDto {
-    Long tariffBalanceChange;
-    Double balanceChange;
+    long tariffBalanceChange;
+    double balanceChange;
 }

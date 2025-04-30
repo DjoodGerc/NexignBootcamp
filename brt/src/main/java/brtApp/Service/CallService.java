@@ -5,6 +5,7 @@ import brtApp.dto.HrsCallDto;
 import brtApp.dto.HrsRetrieveDto;
 import brtApp.entity.CallEntity;
 import brtApp.entity.SubscriberEntity;
+import brtApp.exception.TarifficationException;
 import lombok.extern.slf4j.Slf4j;
 import brtApp.mapper.MyMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +43,13 @@ public class CallService {
         }
         List<HrsRetrieveDto> changeValues = new ArrayList<>();
         for (CdrDto cdrDto : cdrDtoList) {
-
+//            try {
             changeValues.add(processSingleCdr(cdrDto));
+//            }
+//            catch (TarifficationException tarifficationException){
+//                log.warn(tarifficationException.getMessage());
+//            }
+
 
         }
 
@@ -64,11 +70,14 @@ public class CallService {
 
         HrsCallDto hrsCallDto = mapper.callEntityToHrsCallDto(callEntity);
         HrsRetrieveDto hrsRetrieveDto = hrsRest.hrsTarifficationCall(hrsCallDto);
-        SubscriberEntity subscriber = subscriberService.changeBalanceCallTariffication(callEntity.getSubscriber(), hrsRetrieveDto);
-
         callRepository.saveAndFlush(callEntity);
 
-        balanceChangesService.saveChangeEntity(hrsRetrieveDto, subscriber, callEntity.getEndCall().plusMinutes(2));
+
+        SubscriberEntity subscriber= subscriberService.changeBalanceCallTariffication(callEntity.getSubscriber(), hrsRetrieveDto);
+
+        if (hrsRetrieveDto.getBalanceChange()!=0) {
+            balanceChangesService.saveChangeEntity(hrsRetrieveDto, subscriber, callEntity.getEndCall().plusMinutes(2));
+        }
 
         return hrsRetrieveDto;
     }

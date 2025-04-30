@@ -35,7 +35,7 @@ public class CallEntity {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endCall;
 
-    @Column(name = "total_cost", precision = 10, scale = 2)
+    @Column(name = "total_cost", precision = 10)
     private Double totalCost;
 
     @ManyToOne
