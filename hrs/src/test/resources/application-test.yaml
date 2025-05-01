@@ -1,0 +1,35 @@
+spring.application.name: hrs
+
+server:
+  port: 8082
+
+
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    #    platform: postgres
+    url: "jdbc:h2:mem:testdb;MODE=PostgreSQL;NON_KEYWORDS=VALUE;DATABASE_TO_LOWER=TRUE;INIT=CREATE SCHEMA IF NOT EXISTS public"
+    username: sa
+    password: ""
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    parameters:
+      useGenericSql: true
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    default-schema: public
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+brt:
+  service:
+    url: "http://localhost:8082"
