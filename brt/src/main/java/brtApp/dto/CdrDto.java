@@ -29,6 +29,9 @@ public class CdrDto {
         return startDate.isBefore(endDate);
     }
 
+    @AssertTrue(message = "Initiator equals receiver")
+    private boolean isInitiatorEqualsReceiver(){return !initiator.equals(receiver);}
+
     public String getOwner() {
 
         if (this.getFlag().equals("01")) {

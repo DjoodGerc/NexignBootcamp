@@ -21,6 +21,7 @@ spring:
     ports:
       - "5672:5672"
     template:
+      queue: cdr_queue
       exchange: cdr_exchange
       routing-key: cdr_routing_key
   h2:

@@ -64,6 +64,7 @@ public class SubscriberService {
             balanceChangesService.saveChangeEntity(hrsRetrieveDto, subscriber, newDate);
         }
         log.info("Month tariffication passed successfully");
+        log.error("===========================");
 
         return subscriber;
     }
