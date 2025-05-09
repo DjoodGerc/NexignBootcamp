@@ -1,11 +1,15 @@
 package brtApp.Service;
 
 import brtApp.dto.CdrDto;
+import brtApp.dto.DeleteStatusDto;
 import brtApp.dto.HrsRetrieveDto;
+import brtApp.dto.SubscriberCrmDto;
 import brtApp.entity.SubscriberEntity;
+import brtApp.exception.EntityAlreadyExsistsException;
 import brtApp.exception.NotRomashkaException;
+import brtApp.exception.TarifficationException;
 import brtApp.exception.TooEarlyForTarifficationException;
-import brtApp.restInteraction.HrsRest;
+import brtApp.client.HrsRest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +18,7 @@ import brtApp.repository.SubscriberRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -91,6 +96,70 @@ public class SubscriberService {
 
         return lastTariffication.plusDays(30 * fullPeriods);
 
+    }
+
+    public SubscriberEntity saveNewSub(SubscriberCrmDto subsCrm){
+        Optional<SubscriberEntity> subscriberOpt=subscriberRepository.findByMsisdn(subsCrm.getMsisdn());
+        if (subscriberOpt.isPresent()){
+            throw new EntityAlreadyExsistsException("Subs with that msisdn already exists");
+        }
+        subscriberOpt=subscriberRepository.findByPassportData(subsCrm.getPassport());
+        if (subscriberOpt.isPresent()){
+            throw new EntityAlreadyExsistsException("Subs with that passport already exists");
+        }
+
+        SubscriberEntity subscriber=SubscriberEntity.builder()
+                .name(subsCrm.getFullName())
+                .balance(subsCrm.getBalance())
+                .isActive(true)
+                .passportData(subsCrm.getPassport())
+                .msisdn(subsCrm.getMsisdn())
+                .lastMonthTarifficationDate(null)
+                .registrationDate(LocalDateTime.now())
+                .tariffId(subsCrm.getTariff())
+                .build();
+
+        return subscriberRepository.saveAndFlush(subscriber);
+
+
+
+    }
+
+    public SubscriberEntity getSubscriber(String msisdn) {
+        SubscriberEntity subscriber=subscriberRepository.findByMsisdn(msisdn).orElseThrow(()->new EntityNotFoundException("Subs with that msisdn not Found"));
+        return subscriber;
+    }
+
+    public SubscriberEntity updateSub(SubscriberCrmDto subsCrm) {
+        SubscriberEntity subscriber=subscriberRepository.findByMsisdn(subsCrm.getMsisdn()).orElseThrow(()->new EntityNotFoundException("Subs with that msisdn is not exists"));
+        SubscriberEntity updatedSubscriber=SubscriberEntity.builder()
+                .id(subscriber.getId())
+                .name(subsCrm.getFullName())
+                .balance(subsCrm.getBalance())
+                .isActive(true)
+                .passportData(subsCrm.getPassport())
+                .msisdn(subsCrm.getMsisdn())
+                .lastMonthTarifficationDate(null)
+                .registrationDate(LocalDateTime.now())
+                .tariffId(subsCrm.getTariff())
+                .build();
+
+        return subscriberRepository.saveAndFlush(updatedSubscriber);
+    }
+
+
+    public DeleteStatusDto deleteSub(String msisdn) {
+        SubscriberEntity subscriber=subscriberRepository.findByMsisdn(msisdn).orElseThrow(()->new EntityNotFoundException("This sub is not exist"));
+        subscriberRepository.delete(subscriber);
+        return new DeleteStatusDto(msisdn,"deleted");
+    }
+
+    public SubscriberEntity changeTariff(String msisdn, long newTariffId) {
+        SubscriberEntity subscriber=subscriberRepository.findByMsisdn(msisdn).orElseThrow(()->new EntityNotFoundException("Sub with that msisdn is not exists"));
+        //пытаемся достучаться к тарифу мб можно сделать лучше
+        hrsRest.getMonthTariffFeeAndMinutes(newTariffId);
+        subscriber.setTariffId(newTariffId);
+        return subscriberRepository.saveAndFlush(subscriber);
     }
 }
 

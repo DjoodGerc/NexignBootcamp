@@ -1,0 +1,42 @@
+spring.application.name: crm
+
+server:
+  port: 8083
+
+spring:
+
+
+  datasource:
+    #    platform: postgres
+    url: "jdbc:postgresql://localhost:5450/crm_db"
+    username: user
+    password: password
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+
+  liquibase:
+    enabled: true
+    change-log: db/changelog/db.changelog-master.yaml
+    default-schema: public
+
+
+  main:
+    allow-bean-definition-overriding: true
+
+
+logging:
+  level:
+      org:
+        springframework:
+          security: DEBUG
+hrs:
+  service:
+    url: "http://localhost:8082"
+
+brt:
+  service:
+    url: "http://localhost:8081"
+

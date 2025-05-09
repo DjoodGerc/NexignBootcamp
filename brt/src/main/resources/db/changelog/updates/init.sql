@@ -12,11 +12,11 @@ CREATE TABLE change_type(
 CREATE TABLE subscriber (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255),
-    msisdn VARCHAR(11),
+    msisdn VARCHAR(11) UNIQUE,
     tariff_id INTEGER,
     balance DECIMAL,
     registration_date TIMESTAMP,
-    passport_data VARCHAR(10),
+    passport_data VARCHAR(10) UNIQUE,
     tariff_balance INTEGER,
     is_active BOOLEAN
 );

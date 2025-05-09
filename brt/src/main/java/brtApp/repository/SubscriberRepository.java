@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface SubscriberRepository extends JpaRepository<SubscriberEntity, Long> {
 
     Optional<SubscriberEntity> findByMsisdn(String msisdn);
-
+    Optional<SubscriberEntity> findByPassportData(String passport);
 }

@@ -1,4 +1,4 @@
-package brtApp.restInteraction;
+package brtApp.client;
 
 import brtApp.dto.HrsCallDto;
 import brtApp.dto.HrsRetrieveDto;
@@ -16,7 +16,7 @@ public class HrsRest {
 
     public HrsRetrieveDto hrsTarifficationCall(HrsCallDto hrsCallDto) {
         HrsRetrieveDto hrsRetrieveDto=restClient.post()
-                .uri("http://localhost:8082/tarifficateCall")
+                .uri(hrsUrl+"/tarifficateCall")
                 .body(hrsCallDto)
                 .retrieve()
                 .onStatus(status -> status.value() >=400, (request, response) -> {
@@ -28,7 +28,7 @@ public class HrsRest {
 
     public HrsRetrieveDto getMonthTariffFeeAndMinutes(long tariffId) {
         HrsRetrieveDto hrsRetrieveDto=restClient.get()
-                .uri("http://localhost:8082/monthTariffication/"+tariffId)
+                .uri(hrsUrl+"/monthTariffication/"+tariffId)
                 .retrieve()
                 .onStatus(status -> status.value() >=400, (request, response) -> {
                     throw new TarifficationException(response.getStatusCode(),response.getStatusText());

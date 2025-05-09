@@ -1,13 +1,13 @@
-package brtApp;
+package crmApp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BrtApplication {
+public class CrmApplication {
+
 
     public static void main(String[] args) {
-        SpringApplication.run(BrtApplication.class, args);
+        SpringApplication.run(CrmApplication.class, args);
     }
-
 }

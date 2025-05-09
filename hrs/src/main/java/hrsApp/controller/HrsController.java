@@ -2,6 +2,7 @@ package hrsApp.controller;
 
 import hrsApp.dto.HrsCallDto;
 import hrsApp.dto.HrsFeeDto;
+import hrsApp.entity.TariffEntity;
 import hrsApp.exception.MonthTarifficationIsNotAllowedForEventTariffException;
 import hrsApp.service.TariffService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,4 +27,18 @@ public class HrsController {
         HrsFeeDto hrsFeeDto=tariffService.monthTariffication(id);
         return new ResponseEntity<>(hrsFeeDto, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/getAllTariffs")
+    public ResponseEntity<List<TariffEntity>> getAllTariffs(){
+        List<TariffEntity> tariffEntities=tariffService.getAllTariffs();
+        return new ResponseEntity<>(tariffEntities, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getTariffById/{id}")
+    public ResponseEntity<TariffEntity> getTariffById(@PathVariable(name="id") long id){
+        TariffEntity tariff=tariffService.getTariff(id);
+        return new ResponseEntity<>(tariff, HttpStatus.OK);
+    }
+
+
 }

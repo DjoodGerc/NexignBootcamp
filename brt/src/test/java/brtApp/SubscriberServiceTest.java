@@ -9,7 +9,7 @@ import brtApp.exception.NotRomashkaException;
 import brtApp.exception.TarifficationException;
 import brtApp.exception.TooEarlyForTarifficationException;
 import brtApp.repository.SubscriberRepository;
-import brtApp.restInteraction.HrsRest;
+import brtApp.client.HrsRest;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TariffService {
 
@@ -51,7 +53,7 @@ public class TariffService {
         return result;
     }
 
-    private TariffEntity getTariff(Long id) {
+    public TariffEntity getTariff(Long id) {
         return tariffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Тариф с таким id не был найден"));
     }
 
@@ -87,5 +89,9 @@ public class TariffService {
             result.setTariffBalanceChange(tariff.getTariffParametr().getMonthlyMinuteCapacity());
         }
         return result;
+    }
+
+    public List<TariffEntity> getAllTariffs() {
+        return tariffRepository.findAll();
     }
 }

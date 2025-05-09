@@ -27,4 +27,13 @@ services:
         POSTGRES_DB: hrs_db
       ports:
         - "5440:5432"
+  postgresCRM:
+    image: postgres:latest
+    container_name: postgres_crm
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: crm_db
+    ports:
+      - "5450:5432"
 
