@@ -105,7 +105,7 @@ public class CallService {
         SubscriberEntity subscriber = subscriberService.changeBalanceCallTariffication(callEntity.getSubscriber(), hrsRetrieveDto);
 
         if (hrsRetrieveDto.getBalanceChange() != 0) {
-            balanceChangesService.saveChangeEntity(hrsRetrieveDto, subscriber, callEntity.getEndCall().plusMinutes(2));
+            balanceChangesService.saveChangeEntity(hrsRetrieveDto.getBalanceChange(), subscriber, callEntity.getEndCall().plusMinutes(2));
         }
 
         return hrsRetrieveDto;

@@ -1,5 +1,6 @@
 package hrsApp.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class TariffEntity {
 
     @Column(name = "name")
     String name;
+    @JsonProperty("active")
     @Column(name = "is_active")
     boolean isActive;
     @Column(name = "creation_date")

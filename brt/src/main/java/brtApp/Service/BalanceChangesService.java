@@ -19,18 +19,20 @@ public class BalanceChangesService {
     @Autowired
     BalanceChangesRepository balanceChangesRepository;
 
-    public BalanceChangesEntity saveChangeEntity(HrsRetrieveDto hrsRetrieveDto, SubscriberEntity subscriberEntity, LocalDateTime date) {
+    public BalanceChangesEntity saveChangeEntity(Double balanceChange, SubscriberEntity subscriberEntity, LocalDateTime date) {
         BalanceChangesEntity balanceChangesEntity;
-        ChangeTypeEntity changeTypeEntity = changeTypeRepository.findById(hrsRetrieveDto.getBalanceChange() > 0.0d ? BalanceChangeEnum.INCREASE.getId() : BalanceChangeEnum.DECREASE.getId()).orElseThrow();
+        ChangeTypeEntity changeTypeEntity = changeTypeRepository.findById(balanceChange > 0.0d ? BalanceChangeEnum.INCREASE.getId() : BalanceChangeEnum.DECREASE.getId()).orElseThrow();
 
         balanceChangesEntity = BalanceChangesEntity.builder().
-                value(hrsRetrieveDto.getBalanceChange()).
+                value(balanceChange).
                 date(date).
                 subscriber(subscriberEntity).
                 changeType(changeTypeEntity).build();
 
 
         return balanceChangesRepository.saveAndFlush(balanceChangesEntity);
+
+
 
 
     }

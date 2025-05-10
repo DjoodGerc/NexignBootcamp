@@ -3,15 +3,19 @@ package crmApp.service;
 import crmApp.client.BrtClient;
 import crmApp.client.HrsClient;
 import crmApp.dto.*;
+import crmApp.exception.ClientException;
 import crmApp.exception.TariffIsNotActiveException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class ManagerService {
+public class ClientService {
     @Autowired
     BrtClient brt;
     @Autowired
@@ -61,5 +65,20 @@ public class ManagerService {
         SubsTariffDto result=new SubsTariffDto(msisdn,new TariffDto(subsTariff.getId(),subsTariff.getName()),availableTariffs);
         return result;
 
+    }
+
+    public BrtRetrieveSubsData changeBalance(String msisdn, ChangeBalanceDto changeBalanceDto) {
+        if(changeBalanceDto.getAmount()>0) {
+            return brt.changeSubBalance(msisdn, changeBalanceDto);
+        }else{
+            throw new ClientException(HttpStatus.BAD_REQUEST,"Изменение баланса должно быть положительным");
+        }
+    }
+
+    public boolean CheckAuthority(Authentication authentication, String requestMsisdn){
+        if (authentication.getName().equals(requestMsisdn)||authentication.getName().equals("admin")){
+            return true;
+        }
+        else throw new ClientException(HttpStatus.BAD_REQUEST,"Вы не можете получить доступ к частному ресурсу, если вы не менеджер или не владелец номера");
     }
 }

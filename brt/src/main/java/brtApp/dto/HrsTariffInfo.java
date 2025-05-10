@@ -1,11 +1,12 @@
-package crmApp.dto;
+package brtApp.dto;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+
 
 @Data
 @AllArgsConstructor
@@ -14,12 +15,14 @@ public class HrsTariffInfo {
     private Long id;
 
     String name;
-
+    @JsonProperty("active")
     boolean isActive;
 
     LocalDateTime creationDate;
 
     String description;
+
+    TariffParameterEntity tariffParametr;
 
 
     @Data
@@ -38,6 +41,7 @@ public class HrsTariffInfo {
             String name;
         }
 
+        TariffTypeEntity tariffType;
 
         private Double initiatingInternalCallCost;
 
@@ -52,3 +56,4 @@ public class HrsTariffInfo {
         private Double monthlyFee;
     }
 }
+

@@ -2,12 +2,8 @@ package brtApp.controller;
 
 import brtApp.Service.CallService;
 import brtApp.Service.SubscriberService;
-import brtApp.dto.CdrDto;
-import brtApp.dto.DeleteStatusDto;
-import brtApp.dto.HrsRetrieveDto;
-import brtApp.dto.SubscriberCrmDto;
+import brtApp.dto.*;
 import brtApp.entity.SubscriberEntity;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +53,12 @@ public class BrtController {
     @PatchMapping(value = "/changeSubsTariff/{msisdn}/{newTariffId}")
     public ResponseEntity<SubscriberEntity> updateSub(@PathVariable(name="msisdn") String msisdn,@PathVariable(name = "newTariffId") long newTariffId) throws Exception {
         SubscriberEntity subscriber = subscriberService.changeTariff(msisdn,newTariffId);
+        return new ResponseEntity<>(subscriber, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/changeSubBalance/{msisdn}")
+    public ResponseEntity<SubscriberEntity> changeSubBalance(@PathVariable(name="msisdn") String msisdn, @RequestBody ChangeBalanceDto changeBalanceDto) {
+        SubscriberEntity subscriber = subscriberService.changeSubBalance(msisdn,changeBalanceDto);
         return new ResponseEntity<>(subscriber, HttpStatus.OK);
     }
 

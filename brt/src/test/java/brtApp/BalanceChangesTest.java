@@ -38,10 +38,10 @@ public class BalanceChangesTest {
         HrsRetrieveDto hrsRetrieveDto=new HrsRetrieveDto(52L,12.12);
         SubscriberEntity subscriber=subscriberRepository.findById(1l).get();
 
-        BalanceChangesEntity savedEntityInc =balanceChangesService.saveChangeEntity(hrsRetrieveDto,subscriber, LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))));
+        BalanceChangesEntity savedEntityInc =balanceChangesService.saveChangeEntity(hrsRetrieveDto.getBalanceChange(),subscriber, LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))));
         assertEquals(savedEntityInc.getChangeType().getId(), BalanceChangeEnum.INCREASE.getId());
         hrsRetrieveDto=new HrsRetrieveDto(0L,-123.12);
-        BalanceChangesEntity savedEntityDec=balanceChangesService.saveChangeEntity(hrsRetrieveDto,subscriber,LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))));
+        BalanceChangesEntity savedEntityDec=balanceChangesService.saveChangeEntity(hrsRetrieveDto.getBalanceChange(),subscriber,LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))));
         List<BalanceChangesEntity> balanceChangesEntityList=balanceChangesRepository.findAll();
         assertTrue(balanceChangesEntityList.contains(savedEntityInc));
         assertTrue(balanceChangesEntityList.contains(savedEntityDec));
