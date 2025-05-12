@@ -44,13 +44,13 @@ public class SubscriberService {
         return true;
     }
 
-    //Изменение баланса
+    //Изменение баланса после тарификации звонка
     public SubscriberEntity changeBalanceCallTariffication(SubscriberEntity subscriberEntity, HrsRetrieveDto hrsRetrieveDto) {
         subscriberEntity.changeBalance(hrsRetrieveDto.getBalanceChange());
         subscriberEntity.changeTariffBalance(hrsRetrieveDto.getTariffBalanceChange());
         return subscriberRepository.saveAndFlush(subscriberEntity);
     }
-
+    //изменения баланса после помесячной тарификации
     public SubscriberEntity changeBalanceMonthTariffication(SubscriberEntity subscriberEntity, HrsRetrieveDto hrsRetrieveDto) {
         subscriberEntity.changeBalance(hrsRetrieveDto.getBalanceChange());
         subscriberEntity.setTariffBalance(hrsRetrieveDto.getTariffBalanceChange());
@@ -98,17 +98,18 @@ public class SubscriberService {
 
     }
 
-    public SubscriberEntity saveNewSub(SubscriberCrmDto subsCrm){
-        Optional<SubscriberEntity> subscriberOpt=subscriberRepository.findByMsisdn(subsCrm.getMsisdn());
-        if (subscriberOpt.isPresent()){
+    //сохраняем новичка
+    public SubscriberEntity saveNewSub(SubscriberCrmDto subsCrm) {
+        Optional<SubscriberEntity> subscriberOpt = subscriberRepository.findByMsisdn(subsCrm.getMsisdn());
+        if (subscriberOpt.isPresent()) {
             throw new EntityAlreadyExsistsException("Subs with that msisdn already exists");
         }
-        subscriberOpt=subscriberRepository.findByPassportData(subsCrm.getPassport());
-        if (subscriberOpt.isPresent()){
+        subscriberOpt = subscriberRepository.findByPassportData(subsCrm.getPassport());
+        if (subscriberOpt.isPresent()) {
             throw new EntityAlreadyExsistsException("Subs with that passport already exists");
         }
-        HrsTariffInfo hrsTariffInfo=hrsRest.getTariffById(subsCrm.getTariff());
-        SubscriberEntity subscriber=SubscriberEntity.builder()
+        HrsTariffInfo hrsTariffInfo = hrsRest.getTariffById(subsCrm.getTariff());
+        SubscriberEntity subscriber = SubscriberEntity.builder()
                 .name(subsCrm.getFullName())
                 .balance(subsCrm.getBalance())
                 .isActive(true)
@@ -123,18 +124,19 @@ public class SubscriberService {
         return subscriberRepository.saveAndFlush(subscriber);
 
 
-
     }
 
+    //получаем старичка
     public SubscriberEntity getSubscriber(String msisdn) {
-        SubscriberEntity subscriber=subscriberRepository.findByMsisdn(msisdn).orElseThrow(()->new EntityNotFoundException("Subs with that msisdn not Found"));
+        SubscriberEntity subscriber = subscriberRepository.findByMsisdn(msisdn).orElseThrow(() -> new EntityNotFoundException("Subs with that msisdn not Found"));
         return subscriber;
     }
 
+
     public SubscriberEntity updateSub(SubscriberCrmDto subsCrm) {
-        SubscriberEntity subscriber=subscriberRepository.findByMsisdn(subsCrm.getMsisdn()).orElseThrow(()->new EntityNotFoundException("Subs with that msisdn is not exists"));
-        HrsTariffInfo hrsTariffInfo=hrsRest.getTariffById(subsCrm.getTariff());
-        SubscriberEntity updatedSubscriber=SubscriberEntity.builder()
+        SubscriberEntity subscriber = subscriberRepository.findByMsisdn(subsCrm.getMsisdn()).orElseThrow(() -> new EntityNotFoundException("Subs with that msisdn is not exists"));
+        HrsTariffInfo hrsTariffInfo = hrsRest.getTariffById(subsCrm.getTariff());
+        SubscriberEntity updatedSubscriber = SubscriberEntity.builder()
                 .id(subscriber.getId())
                 .name(subsCrm.getFullName())
                 .balance(subsCrm.getBalance())
@@ -152,31 +154,30 @@ public class SubscriberService {
 
 
     public DeleteStatusDto deleteSub(String msisdn) {
-        SubscriberEntity subscriber=subscriberRepository.findByMsisdn(msisdn).orElseThrow(()->new EntityNotFoundException("This sub is not exist"));
+        SubscriberEntity subscriber = subscriberRepository.findByMsisdn(msisdn).orElseThrow(() -> new EntityNotFoundException("This sub is not exist"));
         subscriberRepository.delete(subscriber);
-        return new DeleteStatusDto(msisdn,"deleted");
+        return new DeleteStatusDto(msisdn, "deleted");
     }
 
     public SubscriberEntity changeTariff(String msisdn, Long newTariffId) {
-        SubscriberEntity subscriber=subscriberRepository.findByMsisdn(msisdn).orElseThrow(()->new EntityNotFoundException("Sub with that msisdn is not exists"));
+        SubscriberEntity subscriber = subscriberRepository.findByMsisdn(msisdn).orElseThrow(() -> new EntityNotFoundException("Sub with that msisdn is not exists"));
 
-        if (subscriber.getTariffId().equals(newTariffId)){
-            throw new ClientException(HttpStatus.BAD_REQUEST,"у него уже этот тариф");
+        if (subscriber.getTariffId().equals(newTariffId)) {
+            throw new ClientException(HttpStatus.BAD_REQUEST, "у него уже этот тариф");
         }
-        //пытаемся достучаться к тарифу мб можно сделать лучше
-        if(!hrsRest.getTariffById(newTariffId).isActive()){
+
+        if (!hrsRest.getTariffById(newTariffId).isActive()) {
             throw new ClientException(HttpStatus.BAD_REQUEST, "тариф не активен");
-        };
+        }
         subscriber.setTariffId(newTariffId);
         return subscriberRepository.saveAndFlush(subscriber);
     }
 
     public SubscriberEntity changeSubBalance(String msisdn, ChangeBalanceDto changeBalanceDto) {
-        SubscriberEntity subscriber=subscriberRepository.findByMsisdn(msisdn).orElseThrow(()->new EntityNotFoundException("Subs with that msisdn is not exists"));
-        balanceChangesService.saveChangeEntity(changeBalanceDto.getAmount(),subscriber,LocalDateTime.now());
+        SubscriberEntity subscriber = subscriberRepository.findByMsisdn(msisdn).orElseThrow(() -> new EntityNotFoundException("Subs with that msisdn is not exists"));
+        balanceChangesService.saveChangeEntity(changeBalanceDto.getAmount(), subscriber, LocalDateTime.now());
         subscriber.changeBalance(changeBalanceDto.getAmount());
         return subscriberRepository.saveAndFlush(subscriber);
     }
 }
 
-//TODO: сделать чтобы он тарифицировал нескольок месяцев

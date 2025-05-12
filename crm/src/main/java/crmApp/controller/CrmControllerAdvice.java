@@ -10,11 +10,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class CrmControllerAdvice {
     @ExceptionHandler(ClientException.class)
-    public ResponseEntity<String> handleClientException(ClientException ex){
+    public ResponseEntity<String> handleClientException(ClientException ex) {
         return new ResponseEntity<>(ex.getMessage(), ex.getHttpStatus());
     }
+
     @ExceptionHandler(TariffIsNotActiveException.class)
-    public ResponseEntity<String> handleTariffNotActivatedException(ClientException ex){
+    public ResponseEntity<String> handleTariffNotActivatedException(ClientException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

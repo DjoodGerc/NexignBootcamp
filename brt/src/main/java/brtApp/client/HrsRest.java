@@ -21,47 +21,50 @@ public class HrsRest {
 
     private final RestClient restClient = RestClient.create(hrsUrl);
 
+    //тарификация звонков
     public HrsRetrieveDto hrsTarifficationCall(HrsCallDto hrsCallDto) {
-        HrsRetrieveDto hrsRetrieveDto=restClient.post()
-                .uri(hrsUrl+"/tarifficateCall")
+        HrsRetrieveDto hrsRetrieveDto = restClient.post()
+                .uri(hrsUrl + "/tarifficateCall")
                 .body(hrsCallDto)
-                .retrieve()
-                .onStatus(status -> status.value() >=400, (request, response) -> {
-                    String body = new BufferedReader(
-                            new InputStreamReader(response.getBody(), StandardCharsets.UTF_8))
-                            .lines()
-                            .collect(Collectors.joining("\n"));
-                    throw new TarifficationException(response.getStatusCode(),body.isEmpty() ? response.getStatusText():body);
-                })
-                .body(HrsRetrieveDto.class);
-        return  hrsRetrieveDto;
-    }
-
-    public HrsRetrieveDto getMonthTariffFeeAndMinutes(long tariffId) {
-        HrsRetrieveDto hrsRetrieveDto=restClient.get()
-                .uri(hrsUrl+"/monthTariffication/"+tariffId)
-                .retrieve()
-                .onStatus(status -> status.value() >=400, (request, response) -> {
-                    String body = new BufferedReader(
-                            new InputStreamReader(response.getBody(), StandardCharsets.UTF_8))
-                            .lines()
-                            .collect(Collectors.joining("\n"));
-                    throw new TarifficationException(response.getStatusCode(),body.isEmpty() ? response.getStatusText():body);
-                })
-                .body(HrsRetrieveDto.class);
-        return hrsRetrieveDto;
-    }
-
-    public HrsTariffInfo getTariffById(Long id) {
-        HrsTariffInfo hrsTariffInfos = restClient.get()
-                .uri(hrsUrl + "/getTariffById/"+id)
                 .retrieve()
                 .onStatus(status -> status.value() >= 400, (request, response) -> {
                     String body = new BufferedReader(
                             new InputStreamReader(response.getBody(), StandardCharsets.UTF_8))
                             .lines()
                             .collect(Collectors.joining("\n"));
-                    throw new ClientException(response.getStatusCode(), body.isEmpty() ? response.getStatusText():body);
+                    throw new TarifficationException(response.getStatusCode(), body.isEmpty() ? response.getStatusText() : body);
+                })
+                .body(HrsRetrieveDto.class);
+        return hrsRetrieveDto;
+    }
+
+    //помесячная тарификация
+    public HrsRetrieveDto getMonthTariffFeeAndMinutes(long tariffId) {
+        HrsRetrieveDto hrsRetrieveDto = restClient.get()
+                .uri(hrsUrl + "/monthTariffication/" + tariffId)
+                .retrieve()
+                .onStatus(status -> status.value() >= 400, (request, response) -> {
+                    String body = new BufferedReader(
+                            new InputStreamReader(response.getBody(), StandardCharsets.UTF_8))
+                            .lines()
+                            .collect(Collectors.joining("\n"));
+                    throw new TarifficationException(response.getStatusCode(), body.isEmpty() ? response.getStatusText() : body);
+                })
+                .body(HrsRetrieveDto.class);
+        return hrsRetrieveDto;
+    }
+
+    //получение данных о конкретном тарифе
+    public HrsTariffInfo getTariffById(Long id) {
+        HrsTariffInfo hrsTariffInfos = restClient.get()
+                .uri(hrsUrl + "/getTariffById/" + id)
+                .retrieve()
+                .onStatus(status -> status.value() >= 400, (request, response) -> {
+                    String body = new BufferedReader(
+                            new InputStreamReader(response.getBody(), StandardCharsets.UTF_8))
+                            .lines()
+                            .collect(Collectors.joining("\n"));
+                    throw new ClientException(response.getStatusCode(), body.isEmpty() ? response.getStatusText() : body);
                 })
                 .body(HrsTariffInfo.class);
 
@@ -70,4 +73,4 @@ public class HrsRest {
 
 }
 
-//TODO: Eureka ApiGateway
+

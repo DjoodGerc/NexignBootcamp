@@ -22,6 +22,7 @@ public class CdrService {
     @Autowired
     CallTypeRepository callTypeRepository;
 
+    //маппимся к энтити
     public CallEntity callEntityFromCdr(CdrDto cdrDto) {
         SubscriberEntity subscriber = subscriberService.findSubscriberByOwner(cdrDto);
 
@@ -41,15 +42,19 @@ public class CdrService {
                 .build();
     }
 
+    //получаем оппонента в звонке
     private String mapOpponent(CdrDto dto) {
         return dto.getFlag().equals(CdrFlagEnum.INCOMING.getFlagId()) ? dto.getReceiver() : dto.getInitiator();
     }
 
+
+    //наш/ не наш
     private boolean checkIsRomashkaCall(CdrDto dto) {
         String opponentMsisdn = dto.getFlag().equals(CdrFlagEnum.INCOMING.getFlagId()) ? dto.getReceiver() : dto.getInitiator();
         return subscriberRepository.findByMsisdn(opponentMsisdn).isPresent();
     }
 
+    //маппим флаг к типу из бд
     private CallTypeEntity mapFlagToCallType(String flag) {
         return callTypeRepository.findById(
                         flag.equals(CdrFlagEnum.INCOMING.getFlagId()) ? CallTypeFlagEnum.INCOMING.getFlagId() : CallTypeFlagEnum.OUTGOING.getFlagId())

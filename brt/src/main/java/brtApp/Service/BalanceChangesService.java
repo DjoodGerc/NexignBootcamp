@@ -19,6 +19,7 @@ public class BalanceChangesService {
     @Autowired
     BalanceChangesRepository balanceChangesRepository;
 
+    //сохраняем ненулевые изменения баланса
     public BalanceChangesEntity saveChangeEntity(Double balanceChange, SubscriberEntity subscriberEntity, LocalDateTime date) {
         BalanceChangesEntity balanceChangesEntity;
         ChangeTypeEntity changeTypeEntity = changeTypeRepository.findById(balanceChange > 0.0d ? BalanceChangeEnum.INCREASE.getId() : BalanceChangeEnum.DECREASE.getId()).orElseThrow();

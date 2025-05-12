@@ -8,7 +8,7 @@ spring:
 
   datasource:
     #    platform: postgres
-    url: "jdbc:postgresql://localhost:5430/brt_db"
+    url: "jdbc:postgresql://postgres_brt:5432/brt_db"
     username: user
     password: password
     driverClassName: org.postgresql.Driver
@@ -22,12 +22,15 @@ spring:
     change-log: db/changelog/db.changelog-master.yaml
     default-schema: public
   rabbitmq:
+    host: localRabbitMQ
     username: user
     password: password
     ports:
       - "5672:5672"
     template:
       queue: cdr_queue
+      exchange: cdr_exchange
+      routing-key: cdr_routing_key
 hrs:
   service:
-    url: "http://localhost:8082"
+    url: "http://hrs:8082"

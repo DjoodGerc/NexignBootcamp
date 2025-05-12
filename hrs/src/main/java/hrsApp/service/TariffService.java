@@ -20,7 +20,7 @@ public class TariffService {
     @Autowired
     TariffRepository tariffRepository;
 
-
+    //тарифицируем звонок
     public HrsFeeDto tarifficateCall(HrsCallDto hrsCallDto) {
 
         HrsFeeDto result = new HrsFeeDto();
@@ -53,10 +53,12 @@ public class TariffService {
         return result;
     }
 
+    // получаем инфу о тарифе
     public TariffEntity getTariff(Long id) {
         return tariffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Тариф с таким id не был найден"));
     }
 
+    //получаем данные об оплате
     private double getCallFee(TariffEntity tariff, long callType, boolean isRomashkaCall, long minutes) {
         double callprice;
         if (callType == CallTypeEnum.INCOMING.getId()) {
@@ -77,7 +79,7 @@ public class TariffService {
         return callprice;
     }
 
-
+    //данные о помесячной тарификации
     public HrsFeeDto monthTariffication(Long id) throws MonthTarifficationIsNotAllowedForEventTariffException {
         TariffEntity tariff = tariffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Такого тарифа не существует"));
         HrsFeeDto result = new HrsFeeDto();
@@ -91,6 +93,7 @@ public class TariffService {
         return result;
     }
 
+    //все тарифы
     public List<TariffEntity> getAllTariffs() {
         return tariffRepository.findAll();
     }

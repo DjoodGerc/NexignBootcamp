@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class CdrControllerAdvice {
 
     @ExceptionHandler(DataAlreadyGeneratedException.class)
-    public ResponseEntity<String> handleDataAlreadyGeneratedException(DataAlreadyGeneratedException ex){
+    public ResponseEntity<String> handleDataAlreadyGeneratedException(DataAlreadyGeneratedException ex) {
         return new ResponseEntity<>(ex.getMessage(), ex.getHttpStatus());
     }
 

@@ -14,20 +14,25 @@ public class SubscriberController {
     @Autowired
     ClientService clientService;
 
+
+
+    //тут наверное можно возвращать только балансы
     @GetMapping(value = "/subscriber/{msisdn}/getbalance")
-    public ResponseEntity<BrtRetrieveSubsData> getSubsBalance(@PathVariable(name ="msisdn") String msisdn,Authentication authentication) {
+    public ResponseEntity<BrtRetrieveSubsData> getSubsBalance(@PathVariable(name = "msisdn") String msisdn, Authentication authentication) {
         BrtRetrieveSubsData result = null;
-        if (clientService.CheckAuthority(authentication,msisdn)){
-            result= clientService.hrsGetSubsFullInfo(msisdn);
+        if (clientService.CheckAuthority(authentication, msisdn)) {
+            result = clientService.hrsGetSubsFullInfo(msisdn);
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+
+    //кладем денежки (работает если >0)
     @PutMapping(value = "/subscriber/{msisdn}/changebalance")
-    public ResponseEntity<BrtRetrieveSubsData> changeSubBalance(@PathVariable(name ="msisdn") String msisdn, @RequestBody ChangeBalanceDto changeBalanceDto, Authentication authentication)  {
+    public ResponseEntity<BrtRetrieveSubsData> changeSubBalance(@PathVariable(name = "msisdn") String msisdn, @RequestBody ChangeBalanceDto changeBalanceDto, Authentication authentication) {
         BrtRetrieveSubsData result = null;
-        if (clientService.CheckAuthority(authentication,msisdn)){
-             result=clientService.changeBalance(msisdn,changeBalanceDto);
+        if (clientService.CheckAuthority(authentication, msisdn)) {
+            result = clientService.changeBalance(msisdn, changeBalanceDto);
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

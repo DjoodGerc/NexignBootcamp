@@ -36,7 +36,7 @@ public class BalanceChangesTest {
     @Test
     public void saveChangeEntityTest(){
         HrsRetrieveDto hrsRetrieveDto=new HrsRetrieveDto(52L,12.12);
-        SubscriberEntity subscriber=subscriberRepository.findById(1l).get();
+        SubscriberEntity subscriber=subscriberRepository.findById(1L).get();
 
         BalanceChangesEntity savedEntityInc =balanceChangesService.saveChangeEntity(hrsRetrieveDto.getBalanceChange(),subscriber, LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))));
         assertEquals(savedEntityInc.getChangeType().getId(), BalanceChangeEnum.INCREASE.getId());

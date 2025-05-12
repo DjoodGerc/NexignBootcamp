@@ -38,9 +38,4 @@ public interface MyMapper {
     }
 
 
-
-
-
-
-
 }

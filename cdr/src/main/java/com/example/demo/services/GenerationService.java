@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * служебный класс для генерации
- *
  */
 @Service
 public class GenerationService {
@@ -35,20 +34,22 @@ public class GenerationService {
     @Value("${nPools}")
     int nPools;
 
+    //тээээкс
     public int generateCalls(int bot, int top) throws DataAlreadyGeneratedException {
-
+        //чтобы все было логично данные не генерируются, если их уже нагенерили (есть апи транкейт, но помесячная тарификация в любом случае сломается)
         if (callRepo.count() != 0) {
-            throw new DataAlreadyGeneratedException("Data Already Generated",HttpStatus.ALREADY_REPORTED);
+            throw new DataAlreadyGeneratedException("Data Already Generated", HttpStatus.ALREADY_REPORTED);
         }
 
         List<CallEntity> calls = Collections.synchronizedList(new ArrayList<>());
 
         List<SubscriberEntity> allSubs = subsRepo.findAll();
-
+        //определяем промежуток в котором будут генерироватья звонки
         long startLong = LocalDateTime.now().minusYears(1).minusDays(1).toEpochSecond(ZoneOffset.UTC);
         long endLong = LocalDateTime.now().minusDays(1).toEpochSecond(ZoneOffset.UTC);
         int nCalls = random.nextInt(bot, top);
         ExecutorService pool = Executors.newFixedThreadPool(nPools);
+        //вот такая многопоточка
         for (int i = 0; i < nPools; i++) {
             if (nCalls % nPools != 0 && i == nPools - 1) {
                 pool.execute(new GenerateTask(nCalls % nPools, calls, startLong, endLong, allSubs));
@@ -64,11 +65,13 @@ public class GenerationService {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Thread interrupted", e);
         }
-
+        //по скольку звонки генерировались в разнобой, теперь надо ихсобрать в кучу и проверить
         calls.sort(Comparator.comparing(CallEntity::getStartCall));
 
+        //cdr для каждого пользователя
         ConcurrentHashMap<String, List<CallEntity>> cdrMap = new ConcurrentHashMap<>();
         allSubs.forEach(sub -> cdrMap.put(sub.getMsisdn(), new ArrayList<>()));
+        //последний обработанный звонок (нужен для проверок, чтобы звонки друг на друга не накладывались)
         ConcurrentHashMap<String, LocalDateTime> lastCalls = new ConcurrentHashMap<>();
 
         int approvedCalls = 0;
@@ -85,6 +88,7 @@ public class GenerationService {
 
             approvedCalls++;
 
+            //переход через 00:00
             if (call.getStartCall().getDayOfYear() != call.getEndCall().getDayOfYear()) {
                 LocalDateTime midnight = call.getEndCall().toLocalDate().atStartOfDay();
 
@@ -109,8 +113,7 @@ public class GenerationService {
         return approvedCalls;
     }
 
-
-
+    //добавляем звонок в cdr
     private void processSingleCall(CallEntity call, ConcurrentHashMap<String, List<CallEntity>> cdrMap) {
         cdrMap.computeIfPresent(call.getInitiating().getMsisdn(), (k, v) -> {
             v.add(call);
@@ -124,7 +127,7 @@ public class GenerationService {
 
         checkAndSendReport(call, cdrMap);
     }
-
+    //если 10 - улетает в брт
     private void checkAndSendReport(CallEntity call, ConcurrentHashMap<String, List<CallEntity>> cdrMap) {
         String initMsisdn = call.getInitiating().getMsisdn();
         List<CallEntity> initList = cdrMap.get(initMsisdn);
@@ -143,21 +146,21 @@ public class GenerationService {
         }
     }
 
-    //Валидируем звонки true - если не подходит, false - если подходит (
-    boolean validateCall(ConcurrentHashMap<String,LocalDateTime> lastCalls,CallEntity call){
-        if (!lastCalls.getOrDefault(call.getInitiating().getMsisdn(),call.getStartCall().minusDays(1)).isBefore(call.getStartCall()) ){
+    //Валидируем звонки true - если не подходит, false - если подходит
+    boolean validateCall(ConcurrentHashMap<String, LocalDateTime> lastCalls, CallEntity call) {
+        if (!lastCalls.getOrDefault(call.getInitiating().getMsisdn(), call.getStartCall().minusDays(1)).isBefore(call.getStartCall())) {
             return true;
         }
-        if (!lastCalls.getOrDefault(call.getReceiving().getMsisdn(),call.getStartCall().minusDays(1)).isBefore(call.getStartCall())){
+        if (!lastCalls.getOrDefault(call.getReceiving().getMsisdn(), call.getStartCall().minusDays(1)).isBefore(call.getStartCall())) {
             return true;
         }
 
-        lastCalls.put(call.getReceiving().getMsisdn(),call.getEndCall());
-        lastCalls.put(call.getInitiating().getMsisdn(),call.getEndCall());
+        lastCalls.put(call.getReceiving().getMsisdn(), call.getEndCall());
+        lastCalls.put(call.getInitiating().getMsisdn(), call.getEndCall());
         return false;
     }
 
 
 }
-//TODO: Напиши человеческие юниты, вроде на данный момент все работает,
+
 

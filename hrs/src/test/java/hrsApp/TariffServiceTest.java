@@ -21,7 +21,7 @@ public class TariffServiceTest {
 
     @Test
     public void monthTarifficationPositive() throws MonthTarifficationIsNotAllowedForEventTariffException {
-        HrsFeeDto hrsFeeDto = tariffService.monthTariffication(12l);
+        HrsFeeDto hrsFeeDto = tariffService.monthTariffication(12L);
         assertEquals(-100.0, hrsFeeDto.getBalanceChange());
         assertEquals(50, hrsFeeDto.getTariffBalanceChange());
 

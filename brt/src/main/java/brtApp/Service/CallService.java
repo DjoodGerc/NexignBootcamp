@@ -1,6 +1,7 @@
 package brtApp.Service;
 
 import brtApp.dto.CdrDto;
+import brtApp.dto.CdrFlagEnum;
 import brtApp.dto.HrsCallDto;
 import brtApp.dto.HrsRetrieveDto;
 import brtApp.entity.CallEntity;
@@ -35,25 +36,32 @@ public class CallService {
     @Autowired
     CdrService cdrService;
 
+
+    //обрабатываем то что пришло из рэббита + логируем любые особенности
     public List<HrsRetrieveDto> processCdrList(List<CdrDto> cdrDtoList) {
         String ownerMsisdn = "";
 
+        //ищем владельца cdr
         for (int i = 0; i < cdrDtoList.size(); i++) {
-            if (cdrDtoList.get(i).getFlag().equals("01")||cdrDtoList.get(i).getFlag().equals("02")){
-                ownerMsisdn=cdrDtoList.get(i).getOwner();
+            if (cdrDtoList.get(i).getFlag().equals(CdrFlagEnum.INCOMING.getFlagId()) || cdrDtoList.get(i).getFlag().equals(CdrFlagEnum.OUTGOING.getFlagId())) {
+                ownerMsisdn = cdrDtoList.get(i).getOwner();
             }
         }
-        if (ownerMsisdn.isEmpty()){
+        //если не нашли заявляем об этом,
+        // тут можно с этой порченой cdr что то делать,
+        // например складывать весь мусор в еще одну очередь в рэббите, но
+        if (ownerMsisdn.isEmpty()) {
 
             log.error("Not found valid flag in any cdr");
             log.error("===========================");
             return null;
         }
 
-
+        // наш/не наш абонент
         try {
             subscriberService.validateSubscriber(ownerMsisdn);
         } catch (Exception ex) {
+            //не наш(
             log.error(ownerMsisdn);
             log.error(ex.getMessage());
             log.error("===========================");
@@ -61,16 +69,16 @@ public class CallService {
             return null;
         }
         List<HrsRetrieveDto> changeValues = new ArrayList<>();
-
+        //валидируем записи cdr, если нашли ощибки логируем их, строку не обрабатываем,
+        // если все ок тарифицируем и едем дальше
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         for (int i = 0; i < cdrDtoList.size(); i++) {
 
             CdrDto cdrDto = cdrDtoList.get(i);
-            Set<ConstraintViolation<CdrDto>> violations= validator.validate(cdrDto);
+            Set<ConstraintViolation<CdrDto>> violations = validator.validate(cdrDto);
             if (violations.isEmpty()) {
                 changeValues.add(processSingleCdr(cdrDto));
-            }
-            else{
+            } else {
                 log.error(cdrDto.toString());
                 violations.forEach(v ->
                         log.error("Validation error: {} ", v.getMessage())
@@ -87,6 +95,7 @@ public class CallService {
     private HrsRetrieveDto processSingleCdr(CdrDto cdrDto) {
         CallEntity callEntity = cdrService.callEntityFromCdr(cdrDto);
 
+        //пробуем провести помесячную тарификацию
         try {
             callEntity.setSubscriber(subscriberService.monthTariffication(callEntity.getSubscriber(), callEntity.getStartCall()));
             log.info("monthly tariffication passed: " + callEntity.getSubscriber().getLastMonthTarifficationDate());
@@ -97,11 +106,12 @@ public class CallService {
 
         }
 
+        //получаем данные о тарификации
         HrsCallDto hrsCallDto = mapper.callEntityToHrsCallDto(callEntity);
         HrsRetrieveDto hrsRetrieveDto = hrsRest.hrsTarifficationCall(hrsCallDto);
         callRepository.saveAndFlush(callEntity);
 
-
+        //меняем баланс (если необходимо)
         SubscriberEntity subscriber = subscriberService.changeBalanceCallTariffication(callEntity.getSubscriber(), hrsRetrieveDto);
 
         if (hrsRetrieveDto.getBalanceChange() != 0) {

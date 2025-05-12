@@ -4,7 +4,7 @@ Spring H2 Postgres Liquibase Lombok Mapstruct Jackson Swagger
 для запуска:
 поднимаем кролика и postgres
 ```
-docker compose up
+docker compose up --build
 ```
 1) CDR
   
@@ -83,3 +83,37 @@ http://localhost:8082/swagger-ui/index.html
 Алгоритм:
 
 Обрабатываем входящие звонки и помесячную тарификацию.
+  
+4) CRM
+     
+Тарификация звонков + помесячная тарификация     
+![img.png](images/img_crm.png)
+
+
+подключение к postgres:  
+username: user  
+password: password
+```
+http://127.0.0.1:5450/crm_db
+```
+port:8082
+
+Swagger:
+```
+http://localhost:8083/swagger-ui/index.html
+```
+существует нормальный сваггер от аналитика 
+  
+  
+api менеджера: basic auth admin:admin  
+```
+http://localhost:8083/manager/**
+```
+api пользователя: basic auth {msisdn}:""  (пустое поле)
+```
+http://localhost:8083/subscriber/**
+```
+
+Алгоритм:
+взаимодействует с другими сервисами.
+

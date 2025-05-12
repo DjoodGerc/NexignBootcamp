@@ -48,15 +48,16 @@ public class CdrController {
         return new ResponseEntity<>(callEntities, HttpStatus.OK);
     }
 
+    //генерируем данные bot - нижнее значение; top - верхнее
     @PostMapping(value = "/generate")
     @ResponseBody
-    public ResponseEntity<?> getGenerate(@RequestParam(name = "bot", defaultValue = "1", required = false) Optional<Integer> bot, @RequestParam(name = "top", required = false,defaultValue = "5000") Optional<Integer> top) throws DataAlreadyGeneratedException {
+    public ResponseEntity<?> getGenerate(@RequestParam(name = "bot", defaultValue = "1", required = false) Optional<Integer> bot, @RequestParam(name = "top", required = false, defaultValue = "5000") Optional<Integer> top) throws DataAlreadyGeneratedException {
         int nCalls = generationService.generateCalls(bot.orElse(1), top.orElse(5000));
         return new ResponseEntity<>(String.format("%s calls generated successfully", nCalls), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/truncate")
-    public ResponseEntity<?> truncate(){
+    public ResponseEntity<?> truncate() {
         callRepo.truncateTable();
         return new ResponseEntity<>(HttpStatus.OK);
     }

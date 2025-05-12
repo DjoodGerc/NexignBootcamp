@@ -3,7 +3,6 @@ package brtApp.rabbit;
 import brtApp.Service.CallService;
 import brtApp.Service.SubscriberService;
 import brtApp.dto.CdrDto;
-import jakarta.validation.Valid;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;

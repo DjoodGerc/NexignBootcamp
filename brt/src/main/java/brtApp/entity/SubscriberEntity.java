@@ -28,7 +28,7 @@ public class SubscriberEntity {
     @Column(name = "msisdn", length = 11)
     private String msisdn;
 
-    @Column(name ="tariff_id")
+    @Column(name = "tariff_id")
     private Long tariffId;
 
 

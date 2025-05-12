@@ -12,12 +12,14 @@ import org.springframework.http.HttpStatusCode;
 public class ClientException extends RuntimeException {
     HttpStatusCode httpStatusCode;
     HttpStatus httpStatus;
+
     public ClientException(String message) {
         super(message);
     }
+
     public ClientException(HttpStatusCode status, String message) {
         super(message);
-        this.httpStatusCode=status;
+        this.httpStatusCode = status;
     }
 
 }

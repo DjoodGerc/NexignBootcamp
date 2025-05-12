@@ -23,7 +23,7 @@ public class HrsClient {
     @Value("${hrs.service.url}")
     String hrsUrl;
 
-    RestClient restClient=RestClient.create(hrsUrl);
+    RestClient restClient = RestClient.create(hrsUrl);
 
 
     public List<HrsTariffInfo> getAllTariffs() {
@@ -35,23 +35,24 @@ public class HrsClient {
                             new InputStreamReader(response.getBody(), StandardCharsets.UTF_8))
                             .lines()
                             .collect(Collectors.joining("\n"));
-                    throw new ClientException(HttpStatus.valueOf(response.getStatusCode().value()),body.isEmpty() ? response.getStatusText():body);
+                    throw new ClientException(HttpStatus.valueOf(response.getStatusCode().value()), body.isEmpty() ? response.getStatusText() : body);
                 })
-                .body(new ParameterizedTypeReference<List<HrsTariffInfo>>() {});
+                .body(new ParameterizedTypeReference<List<HrsTariffInfo>>() {
+                });
 
         return hrsTariffInfos;
     }
 
     public HrsTariffInfo getTariffById(long id) {
         HrsTariffInfo hrsTariffInfos = restClient.get()
-                .uri(hrsUrl + "/getTariffById/"+id)
+                .uri(hrsUrl + "/getTariffById/" + id)
                 .retrieve()
                 .onStatus(status -> status.value() >= 400, (request, response) -> {
                     String body = new BufferedReader(
                             new InputStreamReader(response.getBody(), StandardCharsets.UTF_8))
                             .lines()
                             .collect(Collectors.joining("\n"));
-                    throw new ClientException(HttpStatus.valueOf(response.getStatusCode().value()),body.isEmpty() ? response.getStatusText():body);
+                    throw new ClientException(HttpStatus.valueOf(response.getStatusCode().value()), body.isEmpty() ? response.getStatusText() : body);
                 })
                 .body(HrsTariffInfo.class);
 

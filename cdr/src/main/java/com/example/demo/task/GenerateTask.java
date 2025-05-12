@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Random;
 
 public class GenerateTask implements Runnable {
-    private List<CallEntity> calls;
+    private final List<CallEntity> calls;
     long startLong;
     long endLong;
-    private List<SubscriberEntity> allSubs;
+    private final List<SubscriberEntity> allSubs;
     Random random = new Random();
     int end;
 
@@ -23,7 +23,7 @@ public class GenerateTask implements Runnable {
         this.startLong = startLong;
         this.endLong = endLong;
         this.allSubs = allSubs;
-        this.end=end;
+        this.end = end;
 
     }
 
@@ -32,7 +32,7 @@ public class GenerateTask implements Runnable {
     public void run() {
         for (int i = 0; i < end; i++) {
             long randomLong = startLong + (long) (random.nextDouble() * (endLong - startLong));
-            LocalDateTime startTimestamp = LocalDateTime.ofEpochSecond(randomLong,0, ZoneOffset.UTC);
+            LocalDateTime startTimestamp = LocalDateTime.ofEpochSecond(randomLong, 0, ZoneOffset.UTC);
             int s = random.nextInt(0, allSubs.size());
             long duration = random.nextLong(43200);
             LocalDateTime end = startTimestamp.plusSeconds(duration);

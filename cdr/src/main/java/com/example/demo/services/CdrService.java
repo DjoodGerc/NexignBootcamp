@@ -22,10 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * служебный класс для работы с cdr
- * CdrReport(params) - метод для генерации csv, по заданным параметрам
- */
+
 @Service
 public class CdrService {
     @Autowired
@@ -33,7 +30,7 @@ public class CdrService {
     @Autowired
     RmqProducer rmqProducer;
 
-    public void sendCdrReport(String msisdn, List<CallEntity> callEntities){
+    public void sendCdrReport(String msisdn, List<CallEntity> callEntities) {
         List<CdrDto> cdrDtos = mapper.callEntityListToDto(callEntities, msisdn);
         rmqProducer.sendJsonMassage(cdrDtos);
     }

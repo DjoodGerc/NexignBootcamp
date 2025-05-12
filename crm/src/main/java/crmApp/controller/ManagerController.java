@@ -13,46 +13,49 @@ public class ManagerController {
     @Autowired
     ClientService clientService;
 
+    //описаны в сваггере
+    //сохраняем новичка
     @PostMapping(value = "/manager/subscriber/add")
     public ResponseEntity<BrtRetrieveSubsData> addSubscriber(@RequestBody SubscriberCrmDto subscriberDataDto) throws Exception {
-        BrtRetrieveSubsData result= clientService.hrsAddSubscriber(subscriberDataDto);
+        BrtRetrieveSubsData result = clientService.hrsAddSubscriber(subscriberDataDto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
-    @PatchMapping (value = "/manager/subscriber/update")
+
+    //обновляем старичка
+    @PatchMapping(value = "/manager/subscriber/update")
     public ResponseEntity<BrtRetrieveSubsData> updateSubscriber(@RequestBody SubscriberCrmDto subscriberDataDto) throws Exception {
-        BrtRetrieveSubsData result= clientService.hrsUpdateSubscriber(subscriberDataDto);
+        BrtRetrieveSubsData result = clientService.hrsUpdateSubscriber(subscriberDataDto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    //получаем инфу
     @GetMapping(value = "/manager/subscriber/{msisdn}/fullinfo")
-    public ResponseEntity<BrtRetrieveSubsData> getSubsFullInfo(@PathVariable(name ="msisdn") String msisdn) throws Exception {
-        BrtRetrieveSubsData result= clientService.hrsGetSubsFullInfo(msisdn);
+    public ResponseEntity<BrtRetrieveSubsData> getSubsFullInfo(@PathVariable(name = "msisdn") String msisdn) throws Exception {
+        BrtRetrieveSubsData result = clientService.hrsGetSubsFullInfo(msisdn);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 
+    //удаляем
     @DeleteMapping(value = "/manager/subscriber/{msisdn}/delete")
     public ResponseEntity<DeleteStatusDto> deleteSubscriber(@PathVariable(name = "msisdn") String msisdn) throws Exception {
-        DeleteStatusDto deleteStatusDto= clientService.hrsDeleteSubscriber(msisdn);
+        DeleteStatusDto deleteStatusDto = clientService.hrsDeleteSubscriber(msisdn);
         return new ResponseEntity<>(deleteStatusDto, HttpStatus.OK);
     }
 
-
+    //получаем данные по тарифу
     @GetMapping(value = "/manager/subscriber/{msisdn}/gettariff")
-    public ResponseEntity<SubsTariffDto> getSubsTariff(@PathVariable(name ="msisdn") String msisdn) throws Exception {
-        SubsTariffDto result= clientService.getSubsTariff(msisdn);
+    public ResponseEntity<SubsTariffDto> getSubsTariff(@PathVariable(name = "msisdn") String msisdn) throws Exception {
+        SubsTariffDto result = clientService.getSubsTariff(msisdn);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    //меняем тариф
     @PutMapping(value = "/manager/subscriber/changetariff")
     public ResponseEntity<SubsTariffDto> changeSubsTariff(@RequestBody ChangeTariffDto changeTariffDto) throws Exception {
-        SubsTariffDto result= clientService.changeSubsTariff(changeTariffDto.getMsisdn(),changeTariffDto.getNewTariffId());
+        SubsTariffDto result = clientService.changeSubsTariff(changeTariffDto.getMsisdn(), changeTariffDto.getNewTariffId());
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
-
-
-
-
 
 
 }

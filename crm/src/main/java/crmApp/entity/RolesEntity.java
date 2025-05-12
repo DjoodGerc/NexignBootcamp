@@ -16,8 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Transactional
-public class RolesEntity implements GrantedAuthority
-{
+public class RolesEntity implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,7 +30,7 @@ public class RolesEntity implements GrantedAuthority
     }
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "roles",fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
     private Set<SubscriberEntity> subscriber;
 
     @Override

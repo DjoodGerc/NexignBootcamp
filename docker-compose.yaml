@@ -2,6 +2,7 @@
 
 services:
   localRabbitMQ:
+    hostname: localRabbitMQ
     image: rabbitmq:3-management-alpine
     environment:
       RABBITMQ_DEFAULT_USER: user
@@ -9,6 +10,15 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+    networks:
+      - romashka-network
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "rabbitmqctl status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   postgresBrt:
     image: postgres:latest
     container_name: postgres_brt
@@ -18,16 +28,34 @@ services:
       POSTGRES_DB: brt_db
     ports:
       - "5430:5432"
+    restart: always
+    networks:
+      - romashka-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   postgresHrs:
-      image: postgres:latest
-      container_name: postgres_hrs
-      environment:
-        POSTGRES_USER: user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: hrs_db
-      ports:
-        - "5440:5432"
-  postgresCRM:
+    image: postgres:latest
+    container_name: postgres_hrs
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: hrs_db
+    ports:
+      - "5440:5432"
+    restart: always
+    networks:
+      - romashka-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgresCrm:
     image: postgres:latest
     container_name: postgres_crm
     environment:
@@ -36,4 +64,68 @@ services:
       POSTGRES_DB: crm_db
     ports:
       - "5450:5432"
+    restart: always
+    networks:
+      - romashka-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  brt:
+    build: ./brt
+    container_name: brt
+    ports:
+      - "8081:8081"
+    restart: always
+    depends_on:
+      localRabbitMQ:
+        condition: service_healthy
+      postgresBrt:
+        condition: service_healthy
+    networks:
+      - romashka-network
+
+  hrs:
+    build: ./hrs
+    container_name: hrs
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgresHrs:
+        condition: service_healthy
+    networks:
+      - romashka-network
+
+  crm:
+    build: ./crm
+    container_name: crm
+    ports:
+      - "8083:8083"
+    restart: always
+    depends_on:
+      postgresCrm:
+        condition: service_healthy
+    networks:
+      - romashka-network
+
+  cdr:
+    build: ./cdr
+    container_name: cdr
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      localRabbitMQ:
+        condition: service_healthy
+    networks:
+      - romashka-network
+
+
+
+networks:
+  romashka-network:
+
+
+#health чеки?

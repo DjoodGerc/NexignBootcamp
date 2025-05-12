@@ -21,7 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class CrmSecurityConfiguration {
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
 
     }
@@ -39,7 +39,6 @@ public class CrmSecurityConfiguration {
 
         return http.build();
     }
-
 
 
 }
